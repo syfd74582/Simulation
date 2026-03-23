@@ -8,8 +8,7 @@
 ## 🧪 التجارب
 
 ### 🚗 الحركة المنتظمة
-![صورة](Simulation/blob/main/simlation/Satellite-Launch-Simulation-main/Satellite-Launch-Simulation-main.png)
-
+![صورة](simlation/Galvan-cell/Screenshot%202025-12-05%20214955.png)
 شرح:
 تجربة توضح مفهوم الحركة بسرعة ثابتة.
 
