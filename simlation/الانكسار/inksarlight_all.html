@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>محاكاة انكسار الضوء</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.8);
+        }
+        
+        h1 {
+            color: #FFD700;
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+            margin-bottom: 30px;
+        }
+        
+        .simulation-container {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            margin: 20px auto;
+            background: linear-gradient(to bottom, #87CEEB, #1E88E5);
+            border: 2px solid #333;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        #refraction-simulation {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin: 25px 0;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        
+        .control-group {
+            display: flex;
+            align-items: center;
+            margin: 5px;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 8px;
+            border-right: 3px solid #1E88E5;
+        }
+        
+        label {
+            color: #FFD700;
+            margin-left: 10px;
+            min-width: 120px;
+            text-align: right;
+            font-size: 14px;
+        }
+        
+        input[type="range"] {
+            width: 180px;
+            height: 8px;
+            background: #333;
+            border-radius: 4px;
+            -webkit-appearance: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #FF5722;
+            cursor: pointer;
+            box-shadow: 0 0 5px rgba(0,0,0,0.5);
+        }
+        
+        button {
+            background: linear-gradient(to bottom, #4CAF50, #388E3C);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 5px;
+            min-width: 140px;
+            font-size: 16px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+        }
+        
+        .explanation {
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 25px;
+            margin-top: 25px;
+            text-align: right;
+            border-right: 4px solid #1E88E5;
+        }
+        
+        .step {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: rgba(30, 136, 229, 0.2);
+            border-radius: 8px;
+            border-right: 3px solid #1E88E5;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .step::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 100%;
+            background: linear-gradient(to bottom, #1E88E5, #0D47A1);
+        }
+        
+        .value-display {
+            display: inline-block;
+            width: 60px;
+            text-align: center;
+            color: #FF5722;
+            font-weight: bold;
+            font-size: 16px;
+            background-color: rgba(0,0,0,0.3);
+            padding: 5px;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+        
+        .real-example {
+            background-color: rgba(255, 215, 0, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+            border-right: 3px solid #FFD700;
+        }
+        
+        .light-beam {
+            animation: pulse 1.5s infinite alternate;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+        
+        .water {
+            fill: url(#water-gradient);
+        }
+        
+        .interface {
+            stroke: #B2EBF2;
+            stroke-width: 2;
+            stroke-dasharray: 5,5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>✧ محاكاة واقعية لانكسار الضوء ✧</h1>
+        
+        <div class="simulation-container">
+            <svg id="refraction-simulation" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+                <!-- خلفية السماء -->
+                <rect width="100%" height="60%" fill="url(#sky-gradient)"/>
+                
+                <!-- الماء -->
+                <rect class="water" x="0" y="300" width="800" height="200"/>
+                
+                <!-- خط السطح الفاصل -->
+                <line class="interface" x1="0" y1="300" x2="800" y2="300"/>
+                
+                <!-- مصدر الضوء (الشمس) -->
+                <circle cx="400" cy="100" r="40" fill="url(#sun-gradient)" filter="url(#sun-glow)"/>
+                
+                <!-- شعاع الضوء الساقط -->
+                <line id="incident-ray" x1="400" y1="100" x2="400" y2="300" stroke="#FFA000" stroke-width="4" stroke-linecap="round" class="light-beam"/>
+                <path id="incident-arrow" d="M400,300 L390,290 M400,300 L390,310" stroke="#FFA000" stroke-width="3" class="light-beam"/>
+                
+                <!-- شعاع الضوء المنكسر -->
+                <line id="refracted-ray" x1="400" y1="300" x2="400" y2="450" stroke="#FFD600" stroke-width="4" stroke-linecap="round" class="light-beam"/>
+                <path id="refracted-arrow" d="M400,300 L410,310 M400,300 L410,290" stroke="#FFD600" stroke-width="3" class="light-beam"/>
+                
+                <!-- الخط العمودي -->
+                <line id="normal-line" x1="400" y1="200" x2="400" y2="400" stroke="#4CAF50" stroke-width="2" stroke-dasharray="5,5"/>
+                
+                <!-- الزوايا -->
+                <path id="incident-angle-arc" d="" fill="none" stroke="#FFA000" stroke-width="2"/>
+                <text id="incident-angle-text" x="430" y="250" fill="#FFA000" font-size="14">زاوية السقوط</text>
+                
+                <path id="refracted-angle-arc" d="" fill="none" stroke="#FFD600" stroke-width="2"/>
+                <text id="refracted-angle-text" x="370" y="350" fill="#FFD600" font-size="14">زاوية الانكسار</text>
+                
+                <!-- نقطة الانكسار -->
+                <circle cx="400" cy="300" r="6" fill="#FF5722"/>
+                
+                <!-- سمكة -->
+                <path id="fish" d="M450,400 Q470,390 490,400 Q510,410 490,420 Q470,430 450,420 Q440,410 450,400" fill="#FF5722"/>
+                <circle cx="480" cy="400" r="2" fill="#000"/>
+                
+                <!-- التدرجات والمرشحات -->
+                <defs>
+                    <linearGradient id="sky-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" stop-color="#87CEEB"/>
+                        <stop offset="100%" stop-color="#1E88E5"/>
+                    </linearGradient>
+                    
+                    <linearGradient id="water-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" stop-color="#1E88E5" stop-opacity="0.8"/>
+                        <stop offset="100%" stop-color="#0D47A1" stop-opacity="0.9"/>
+                    </linearGradient>
+                    
+                    <radialGradient id="sun-gradient" cx="30%" cy="30%" r="70%">
+                        <stop offset="0%" stop-color="#FFD700"/>
+                        <stop offset="50%" stop-color="#FF8C00"/>
+                        <stop offset="100%" stop-color="#FF4500"/>
+                    </radialGradient>
+                    
+                    <filter id="sun-glow" x="-30%" y="-30%" width="160%" height="160%">
+                        <feGaussianBlur stdDeviation="5" result="blur"/>
+                        <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+                    </filter>
+                    
+                    <filter id="light-glow" x="-30%" y="-30%" width="160%" height="160%">
+                        <feGaussianBlur stdDeviation="3" result="blur"/>
+                        <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+                    </filter>
+                </defs>
+                
+                <!-- نص توضيحي -->
+                <text x="400" y="100" fill="#FFD700" font-size="14" text-anchor="middle">الشمس</text>
+                <text x="400" y="280" fill="#4CAF50" font-size="14" text-anchor="middle">السطح الفاصل</text>
+                <text x="490" cy="400" fill="#FF5722" font-size="14" text-anchor="middle">السمكة</text>
+                <text x="400" y="470" fill="#FFD600" font-size="14" text-anchor="middle">موقع السمكة الظاهر</text>
+            </svg>
+        </div>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label for="angle-control">زاوية السقوط:</label>
+                <input type="range" id="angle-control" min="0" max="80" value="0">
+                <span class="value-display" id="angle-value">0°</span>
+            </div>
+            
+            <div class="control-group">
+                <label for="medium-control">الوسط الثاني:</label>
+                <select id="medium-control" style="width:180px; padding:5px; background:#333; color:#FFF; border:none; border-radius:4px;">
+                    <option value="1.33">ماء (n=1.33)</option>
+                    <option value="1.5">زجاج (n=1.5)</option>
+                    <option value="2.42">ألماس (n=2.42)</option>
+                    <option value="1.2">زيت (n=1.2)</option>
+                </select>
+            </div>
+            
+            <button id="reset-btn">🔄 إعادة الضبط</button>
+            <button id="demo-btn">▶️ عرض توضيحي</button>
+            <button id="explain-btn">❓ شرح العملية</button>
+        </div>
+        
+        <div class="real-example">
+            <h3>✧ مثال واقعي ✧</h3>
+            <p>عندما تنظر إلى سمكة في الماء، تبدو أقرب إلى السطح مما هي عليه في الواقع. هذا بسبب انكسار الضوء عند انتقاله من الماء إلى الهواء.</p>
+        </div>
+        
+        <div class="explanation" id="dynamic-explanation">
+            <h3>🔍 كيف يحدث الانكسار؟</h3>
+            
+            <div class="step">
+                <h4>1. الضوء الساقط</h4>
+                <p>ينتقل الضوء من الشمس (الوسط الأول - الهواء) ويسقط على سطح الماء بزاوية معينة.</p>
+            </div>
+            
+            <div class="step">
+                <h4>2. الانكسار</h4>
+                <p>عندما يعبر الضوء إلى الماء (الوسط الثاني)، ينكسر وفقًا لقانون سنيل:</p>
+                <p id="snells-law" style="color:#FFD700; font-weight:bold">n₁ × sin(θ₁) = n₂ × sin(θ₂)</p>
+                <p>حيث n₁ هو معامل انكسار الهواء (1.0) و n₂ هو معامل انكسار الوسط الثاني.</p>
+            </div>
+            
+            <div class="step">
+                <h4>3. تغير اتجاه الضوء</h4>
+                <p>ينحني الضوء نحو الخط العمودي عندما ينتقل إلى وسط أكثر كثافة ضوئية (معامل انكسار أعلى).</p>
+            </div>
+            
+            <div class="step">
+                <h4>4. الرؤية الخادعة</h4>
+                <p>بسبب الانكسار، تبدو السمكة أقرب إلى السطح مما هي عليه في الواقع، مما يجعل الصيد صعبًا!</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // العناصر SVG
+            const incidentRay = document.getElementById('incident-ray');
+            const refractedRay = document.getElementById('refracted-ray');
+            const incidentArrow = document.getElementById('incident-arrow');
+            const refractedArrow = document.getElementById('refracted-arrow');
+            const incidentAngleArc = document.getElementById('incident-angle-arc');
+            const refractedAngleArc = document.getElementById('refracted-angle-arc');
+            const incidentAngleText = document.getElementById('incident-angle-text');
+            const refractedAngleText = document.getElementById('refracted-angle-text');
+            const fish = document.getElementById('fish');
+            const dynamicExplanation = document.getElementById('dynamic-explanation');
+            const snellsLaw = document.getElementById('snells-law');
+            
+            // عناصر التحكم
+            const angleControl = document.getElementById('angle-control');
+            const mediumControl = document.getElementById('medium-control');
+            const angleValue = document.getElementById('angle-value');
+            const resetBtn = document.getElementById('reset-btn');
+            const demoBtn = document.getElementById('demo-btn');
+            const explainBtn = document.getElementById('explain-btn');
+            
+            // نقطة الانكسار (السطح الفاصل)
+            const interfaceX = 400;
+            const interfaceY = 300;
+            
+            // معاملات الانكسار
+            const n1 = 1.0; // الهواء
+            let n2 = 1.33; // الماء
+            
+            // تحديث المحاكاة
+            function updateSimulation() {
+                // الحصول على القيم من عناصر التحكم
+                const incidentAngle = parseInt(angleControl.value);
+                n2 = parseFloat(mediumControl.value);
+                
+                // تحديث عرض القيم
+                angleValue.textContent = incidentAngle + '°';
+                
+                // حساب موقع الشمس
+                const sunLength = 200;
+                const sunAngle = (90 + incidentAngle) * Math.PI / 180;
+                const sunX = interfaceX - sunLength * Math.cos(sunAngle);
+                const sunY = interfaceY - sunLength * Math.sin(sunAngle);
+                
+                // تحديث شعاع الضوء الساقط
+                incidentRay.setAttribute('x1', sunX);
+                incidentRay.setAttribute('y1', sunY);
+                
+                // تحديث السهم الساقط
+                incidentArrow.setAttribute('d', 
+                    `M${interfaceX},${interfaceY} L${interfaceX-10},${interfaceY-10} ` +
+                    `M${interfaceX},${interfaceY} L${interfaceX+10},${interfaceY-10}`
+                );
+                
+                // حساب زاوية الانكسار باستخدام قانون سنيل
+                let refractedAngle;
+                if (incidentAngle === 0) {
+                    refractedAngle = 0; // لا انكسار عند السقوط العمودي
+                } else {
+                    const criticalAngle = Math.asin(n2 / n1) * 180 / Math.PI;
+                    if (incidentAngle >= criticalAngle && n1 > n2) {
+                        refractedAngle = 90; // انعكاس كلي داخلي
+                    } else {
+                        refractedAngle = Math.asin((n1 / n2) * Math.sin(incidentAngle * Math.PI / 180)) * 180 / Math.PI;
+                    }
+                }
+                
+                // تحديث شعاع الضوء المنكسر
+                const refractedLength = 150;
+                const refractedAngleRad = (90 - refractedAngle) * Math.PI / 180;
+                const refractedX = interfaceX + refractedLength * Math.cos(refractedAngleRad);
+                const refractedY = interfaceY + refractedLength * Math.sin(refractedAngleRad);
+                
+                refractedRay.setAttribute('x2', refractedX);
+                refractedRay.setAttribute('y2', refractedY);
+                
+                // تحديث السهم المنكسر
+                refractedArrow.setAttribute('d', 
+                    `M${interfaceX},${interfaceY} L${interfaceX+10*Math.cos(refractedAngleRad)},${interfaceY+10*Math.sin(refractedAngleRad)} ` +
+                    `M${interfaceX},${interfaceY} L${interfaceX+10*Math.cos(refractedAngleRad)},${interfaceY+10*Math.sin(refractedAngleRad)}`
+                );
+                
+                // تحديث موقع السمكة الظاهر (بسبب الانكسار)
+                const apparentDepth = 100 * (n1 / n2);
+                const fishY = interfaceY + 100;
+                const apparentFishY = interfaceY + apparentDepth;
+                
+                fish.setAttribute('d', `M450,${fishY} Q470,${fishY-10} 490,${fishY} Q510,${fishY+10} 490,${fishY+20} Q470,${fishY+30} 450,${fishY+20} Q440,${fishY+10} 450,${fishY}`);
+                
+                // رسم الزوايا
+                const arcRadius = 30;
+                drawAngleArc(incidentAngleArc, interfaceX, interfaceY, 
+                    interfaceX, interfaceY - 100, sunX, sunY, arcRadius, '#FFA000');
+                drawAngleArc(refractedAngleArc, interfaceX, interfaceY, 
+                    interfaceX, interfaceY + 100, refractedX, refractedY, arcRadius, '#FFD600');
+                
+                // تحديث موقع نصوص الزوايا
+                updateAngleText(incidentAngleText, interfaceX, interfaceY, 
+                    interfaceX, interfaceY - 100, sunX, sunY, arcRadius + 15);
+                updateAngleText(refractedAngleText, interfaceX, interfaceY, 
+                    interfaceX, interfaceY + 100, refractedX, refractedY, arcRadius + 15);
+                
+                // تحديث الشرح الديناميكي
+                updateExplanation(incidentAngle, refractedAngle);
+            }
+            
+            // رسم قوس الزاوية
+            function drawAngleArc(arcElement, centerX, centerY, x1, y1, x2, y2, radius, color) {
+                // حساب الزوايا
+                const angle1 = Math.atan2(y1 - centerY, x1 - centerX);
+                const angle2 = Math.atan2(y2 - centerY, x2 - centerX);
+                
+                // تحديد اتجاه الرسم
+                const startAngle = Math.min(angle1, angle2);
+                const endAngle = Math.max(angle1, angle2);
+                const largeArcFlag = (endAngle - startAngle) <= Math.PI ? "0" : "1";
+                
+                // نقاط البداية والنهاية
+                const xStart = centerX + radius * Math.cos(startAngle);
+                const yStart = centerY + radius * Math.sin(startAngle);
+                const xEnd = centerX + radius * Math.cos(endAngle);
+                const yEnd = centerY + radius * Math.sin(endAngle);
+                
+                // إنشاء مسار القوس
+                const pathData = `M${xStart},${yStart} A${radius},${radius} 0 ${largeArcFlag} 1 ${xEnd},${yEnd}`;
+                arcElement.setAttribute('d', pathData);
+                arcElement.setAttribute('stroke', color);
+            }
+            
+            // تحديث نص الزاوية
+            function updateAngleText(textElement, centerX, centerY, x1, y1, x2, y2, radius) {
+                // نقطة المنتصف بين الشعاعين
+                const angle1 = Math.atan2(y1 - centerY, x1 - centerX);
+                const angle2 = Math.atan2(y2 - centerY, x2 - centerX);
+                const midAngle = (angle1 + angle2) / 2;
+                
+                const textX = centerX + (radius + 5) * Math.cos(midAngle);
+                const textY = centerY + (radius + 5) * Math.sin(midAngle);
+                
+                textElement.setAttribute('x', textX);
+                textElement.setAttribute('y', textY);
+            }
+            
+            // تحديث الشرح التفاعلي
+            function updateExplanation(incidentAngle, refractedAngle) {
+                const steps = dynamicExplanation.querySelectorAll('.step');
+                
+                // الخطوة 1
+                steps[0].querySelector('p').innerHTML = 
+                    `ينتقل الضوء من الشمس (الهواء - n=1.0) ويسقط على سطح الماء بزاوية <span style="color:#FFA000">${incidentAngle}°</span> بالنسبة للخط العمودي.`;
+                
+                // الخطوة 2
+                snellsLaw.innerHTML = 
+                    `n₁ × sin(θ₁) = n₂ × sin(θ₂)<br>1.0 × sin(${incidentAngle}°) = ${n2} × sin(${refractedAngle.toFixed(1)}°)`;
+                
+                // الخطوة 3
+                if (incidentAngle === 0) {
+                    steps[2].querySelector('p').innerHTML = 
+                        `عندما يسقط الضوء عموديًا (زاوية 0°)، لا ينكسر لكنه يستمر في خط مستقيم.`;
+                } else if (refractedAngle === 90) {
+                    steps[2].querySelector('p').innerHTML = 
+                        `حدث انعكاس كلي داخلي! عندما تكون زاوية السقوط أكبر من الزاوية الحرجة (${Math.asin(n2/n1)*180/Math.PI.toFixed(1)}°)، ينعكس كل الضوء.`;
+                } else {
+                    steps[2].querySelector('p').innerHTML = 
+                        `ينحني الضوء نحو الخط العمودي (لأن الماء أكثر كثافة ضوئية من الهواء) بزاوية <span style="color:#FFD600">${refractedAngle.toFixed(1)}°</span>.`;
+                }
+                
+                // الخطوة 4
+                steps[3].querySelector('p').innerHTML = 
+                    `بسبب الانكسار، تبدو السمكة على عمق ${(100*(n1/n2)).toFixed(1)}px بدلاً من 100px الحقيقية. هذا يجعلها تبدو أقرب إلى السطح بنسبة ${((1 - n1/n2)*100).toFixed(0)}%!`;
+            }
+            
+            // عرض توضيحي
+            function runDemo() {
+                let angle = 0;
+                let direction = 1;
+                const demoInterval = setInterval(() => {
+                    angle += direction;
+                    angleControl.value = angle;
+                    
+                    if (angle >= 80) direction = -1;
+                    if (angle <= 0) direction = 1;
+                    
+                    updateSimulation();
+                }, 100);
+                
+                // إيقاف العرض التوضيحي بعد 15 ثانية
+                setTimeout(() => {
+                    clearInterval(demoInterval);
+                }, 15000);
+            }
+            
+            // شرح العملية خطوة بخطوة
+            function explainProcess() {
+                const steps = dynamicExplanation.querySelectorAll('.step');
+                let delay = 0;
+                
+                // إخفاء جميع الخطوات أولاً
+                steps.forEach(step => {
+                    step.style.opacity = '0';
+                    step.style.maxHeight = '0';
+                    step.style.marginBottom = '0';
+                    step.style.transition = 'none';
+                });
+                
+                // عرض كل خطوة بتتابع
+                steps.forEach((step, index) => {
+                    setTimeout(() => {
+                        step.style.transition = 'all 0.5s ease';
+                        step.style.opacity = '1';
+                        step.style.maxHeight = '200px';
+                        step.style.marginBottom = '20px';
+                    }, delay);
+                    
+                    delay += 1000; // تأخير ثانية بين كل خطوة
+                });
+            }
+            
+            // استماع لأحداث التحكم
+            angleControl.addEventListener('input', updateSimulation);
+            mediumControl.addEventListener('change', updateSimulation);
+            resetBtn.addEventListener('click', () => {
+                angleControl.value = 0;
+                mediumControl.value = 1.33;
+                updateSimulation();
+            });
+            demoBtn.addEventListener('click', runDemo);
+            explainBtn.addEventListener('click', explainProcess);
+            
+            // التهيئة الأولية
+            updateSimulation();
+            explainProcess(); // عرض الشرح تلقائيًا
+        });
+    </script>
+</body>
+</html>

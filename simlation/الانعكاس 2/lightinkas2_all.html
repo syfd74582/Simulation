@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>محاكاة انعكاس الضوء</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #000;
+            color: white;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+        
+        h1 {
+            color: #FFD700;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+        
+        .simulation-container {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            margin: 20px auto;
+            background-color: #000;
+            border: 2px solid #333;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        #light-simulation {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        
+        .control-group {
+            display: flex;
+            align-items: center;
+            margin: 5px;
+        }
+        
+        label {
+            color: #FFD700;
+            margin-left: 10px;
+            min-width: 100px;
+            text-align: right;
+        }
+        
+        input[type="range"] {
+            width: 150px;
+        }
+        
+        button {
+            background: linear-gradient(to bottom, #4CAF50, #388E3C);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 5px;
+            min-width: 120px;
+        }
+        
+        button:hover {
+            opacity: 0.9;
+        }
+        
+        .explanation {
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: right;
+            border-right: 4px solid #1E88E5;
+        }
+        
+        .step {
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: rgba(30, 136, 229, 0.2);
+            border-radius: 5px;
+            border-right: 3px solid #1E88E5;
+        }
+        
+        .value-display {
+            display: inline-block;
+            width: 50px;
+            text-align: center;
+            color: #FF5722;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>محاكاة تفاعلية لانعكاس الضوء</h1>
+        
+        <div class="simulation-container">
+            <svg id="light-simulation" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400">
+                <!-- خلفية -->
+                <rect width="100%" height="100%" fill="#000"/>
+                
+                <!-- المرآة -->
+                <line id="mirror" x1="200" y1="300" x2="600" y2="100" stroke="#1E88E5" stroke-width="3" stroke-linecap="round"/>
+                <text x="400" y="80" fill="#1E88E5" font-size="16" text-anchor="middle">سطح المرآة</text>
+                
+                <!-- الخط العمودي -->
+                <line id="normal-line" x1="400" y1="200" x2="400" y2="50" stroke="#4CAF50" stroke-width="2" stroke-dasharray="5,5"/>
+                <text x="420" y="120" fill="#4CAF50" font-size="14">الخط العمودي</text>
+                
+                <!-- شعاع الضوء الساقط -->
+                <line id="incident-ray" x1="100" y1="350" x2="400" y2="200" stroke="#FF5722" stroke-width="3"/>
+                <path id="incident-arrow" d="M400,200 L390,190 M400,200 L390,210" stroke="#FF5722" stroke-width="2"/>
+                <text x="250" y="300" fill="#FF5722" font-size="14">شعاع الضوء الساقط</text>
+                
+                <!-- شعاع الضوء المنعكس -->
+                <line id="reflected-ray" x1="400" y1="200" x2="700" y2="50" stroke="#FFD700" stroke-width="3"/>
+                <path id="reflected-arrow" d="M400,200 L410,190 M400,200 L410,210" stroke="#FFD700" stroke-width="2"/>
+                <text x="550" y="120" fill="#FFD700" font-size="14">شعاع الضوء المنعكس</text>
+                
+                <!-- الزوايا -->
+                <path id="incident-angle-arc" d="" fill="none" stroke="#FF5722" stroke-width="1"/>
+                <text id="incident-angle-text" x="350" y="170" fill="#FF5722" font-size="12">زاوية السقوط</text>
+                
+                <path id="reflected-angle-arc" d="" fill="none" stroke="#FFD700" stroke-width="1"/>
+                <text id="reflected-angle-text" x="450" y="170" fill="#FFD700" font-size="12">زاوية الانعكاس</text>
+                
+                <!-- النقطة المركزية -->
+                <circle cx="400" cy="200" r="5" fill="#FFF"/>
+            </svg>
+        </div>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label for="angle-control">زاوية السقوط:</label>
+                <input type="range" id="angle-control" min="10" max="80" value="45">
+                <span class="value-display" id="angle-value">45°</span>
+            </div>
+            
+            <div class="control-group">
+                <label for="mirror-control">ميلان المرآة:</label>
+                <input type="range" id="mirror-control" min="-30" max="30" value="0">
+                <span class="value-display" id="mirror-value">0°</span>
+            </div>
+            
+            <button id="reset-btn">إعادة الضبط</button>
+            <button id="demo-btn">عرض توضيحي</button>
+        </div>
+        
+        <div class="explanation">
+            <h3>كيف يعمل انعكاس الضوء؟</h3>
+            
+            <div class="step">
+                <h4>القانون الأول للانعكاس:</h4>
+                <p>شعاع الضوء الساقط وشعاع الضوء المنعكس والخط العمودي على السطح العاكس جميعها تقع في نفس المستوى.</p>
+            </div>
+            
+            <div class="step">
+                <h4>القانون الثاني للانعكاس:</h4>
+                <p>زاوية السقوط تساوي زاوية الانعكاس. الزاوية تقاس بين الشعاع والخط العمودي على السطح.</p>
+                <p id="angles-equation" style="color:#FFD700; font-weight:bold">زاوية السقوط (θi) = زاوية الانعكاس (θr)</p>
+            </div>
+            
+            <div class="step">
+                <h4>جرب بنفسك:</h4>
+                <p>1. حرك زاوية السقوط لترى كيف يتغير الانعكاس</p>
+                <p>2. غير ميلان المرآة لترى كيف يؤثر على اتجاه الانعكاس</p>
+                <p>3. اضغط على "عرض توضيحي" لمشاهدة شرح متحرك</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // العناصر SVG
+            const mirror = document.getElementById('mirror');
+            const normalLine = document.getElementById('normal-line');
+            const incidentRay = document.getElementById('incident-ray');
+            const reflectedRay = document.getElementById('reflected-ray');
+            const incidentArrow = document.getElementById('incident-arrow');
+            const reflectedArrow = document.getElementById('reflected-arrow');
+            const incidentAngleArc = document.getElementById('incident-angle-arc');
+            const reflectedAngleArc = document.getElementById('reflected-angle-arc');
+            const incidentAngleText = document.getElementById('incident-angle-text');
+            const reflectedAngleText = document.getElementById('reflected-angle-text');
+            
+            // عناصر التحكم
+            const angleControl = document.getElementById('angle-control');
+            const mirrorControl = document.getElementById('mirror-control');
+            const angleValue = document.getElementById('angle-value');
+            const mirrorValue = document.getElementById('mirror-value');
+            const resetBtn = document.getElementById('reset-btn');
+            const demoBtn = document.getElementById('demo-btn');
+            const anglesEquation = document.getElementById('angles-equation');
+            
+            // مركز الانعكاس (نقطة التقاء الشعاع بالمرآة)
+            const centerX = 400;
+            const centerY = 200;
+            
+            // تحديث المحاكاة
+            function updateSimulation() {
+                // الحصول على القيم من عناصر التحكم
+                const incidentAngle = parseInt(angleControl.value);
+                const mirrorTilt = parseInt(mirrorControl.value);
+                
+                // تحديث عرض القيم
+                angleValue.textContent = incidentAngle + '°';
+                mirrorValue.textContent = mirrorTilt + '°';
+                
+                // حساب ميلان المرآة
+                const mirrorAngle = 20 + mirrorTilt; // 20 هو الميل الأساسي للمرآة
+                const mirrorRad = mirrorAngle * Math.PI / 180;
+                
+                // تحديث موقع المرآة
+                const mirrorLength = 300;
+                const mirrorX1 = centerX - mirrorLength/2 * Math.cos(mirrorRad);
+                const mirrorY1 = centerY - mirrorLength/2 * Math.sin(mirrorRad);
+                const mirrorX2 = centerX + mirrorLength/2 * Math.cos(mirrorRad);
+                const mirrorY2 = centerY + mirrorLength/2 * Math.sin(mirrorRad);
+                
+                mirror.setAttribute('x1', mirrorX1);
+                mirror.setAttribute('y1', mirrorY1);
+                mirror.setAttribute('x2', mirrorX2);
+                mirror.setAttribute('y2', mirrorY2);
+                
+                // الخط العمودي على المرآة
+                const normalLength = 150;
+                const normalX = centerX + normalLength * Math.sin(mirrorRad);
+                const normalY = centerY - normalLength * Math.cos(mirrorRad);
+                
+                normalLine.setAttribute('x2', normalX);
+                normalLine.setAttribute('y2', normalY);
+                
+                // شعاع الضوء الساقط
+                const incidentLength = 350;
+                const incidentRad = (180 - incidentAngle + mirrorAngle) * Math.PI / 180;
+                const incidentX = centerX - incidentLength * Math.cos(incidentRad);
+                const incidentY = centerY - incidentLength * Math.sin(incidentRad);
+                
+                incidentRay.setAttribute('x1', incidentX);
+                incidentRay.setAttribute('y1', incidentY);
+                
+                // تحديث السهم
+                incidentArrow.setAttribute('d', 
+                    `M${centerX},${centerY} L${centerX-10*Math.cos(incidentRad+0.2)},${centerY-10*Math.sin(incidentRad+0.2)} ` +
+                    `M${centerX},${centerY} L${centerX-10*Math.cos(incidentRad-0.2)},${centerY-10*Math.sin(incidentRad-0.2)}`
+                );
+                
+                // شعاع الضوء المنعكس (زاوية الانعكاس = زاوية السقوط)
+                const reflectedRad = (incidentAngle + mirrorAngle) * Math.PI / 180;
+                const reflectedX = centerX + incidentLength * Math.cos(reflectedRad);
+                const reflectedY = centerY - incidentLength * Math.sin(reflectedRad);
+                
+                reflectedRay.setAttribute('x2', reflectedX);
+                reflectedRay.setAttribute('y2', reflectedY);
+                
+                // تحديث السهم
+                reflectedArrow.setAttribute('d', 
+                    `M${centerX},${centerY} L${centerX+10*Math.cos(reflectedRad+0.2)},${centerY-10*Math.sin(reflectedRad+0.2)} ` +
+                    `M${centerX},${centerY} L${centerX+10*Math.cos(reflectedRad-0.2)},${centerY-10*Math.sin(reflectedRad-0.2)}`
+                );
+                
+                // رسم زوايا السقوط والانعكاس
+                const arcRadius = 30;
+                drawAngleArc(incidentAngleArc, centerX, centerY, normalX, centerY, incidentX, incidentY, arcRadius, '#FF5722');
+                drawAngleArc(reflectedAngleArc, centerX, centerY, normalX, centerY, reflectedX, reflectedY, arcRadius, '#FFD700');
+                
+                // تحديث موقع نصوص الزوايا
+                updateAngleText(incidentAngleText, centerX, centerY, normalX, centerY, incidentX, incidentY, arcRadius + 20);
+                updateAngleText(reflectedAngleText, centerX, centerY, normalX, centerY, reflectedX, reflectedY, arcRadius + 20);
+                
+                // تحديث المعادلة
+                anglesEquation.textContent = `زاوية السقوط (${incidentAngle}°) = زاوية الانعكاس (${incidentAngle}°)`;
+            }
+            
+            // رسم قوس الزاوية
+            function drawAngleArc(arcElement, centerX, centerY, x1, y1, x2, y2, radius, color) {
+                // حساب الزوايا
+                const angle1 = Math.atan2(y1 - centerY, x1 - centerX);
+                const angle2 = Math.atan2(y2 - centerY, x2 - centerX);
+                
+                // تحديد اتجاه الرسم
+                const startAngle = Math.min(angle1, angle2);
+                const endAngle = Math.max(angle1, angle2);
+                const largeArcFlag = (endAngle - startAngle) <= Math.PI ? "0" : "1";
+                
+                // نقاط البداية والنهاية
+                const xStart = centerX + radius * Math.cos(startAngle);
+                const yStart = centerY + radius * Math.sin(startAngle);
+                const xEnd = centerX + radius * Math.cos(endAngle);
+                const yEnd = centerY + radius * Math.sin(endAngle);
+                
+                // إنشاء مسار القوس
+                const pathData = `M${xStart},${yStart} A${radius},${radius} 0 ${largeArcFlag} 1 ${xEnd},${yEnd}`;
+                arcElement.setAttribute('d', pathData);
+                arcElement.setAttribute('stroke', color);
+            }
+            
+            // تحديث نص الزاوية
+            function updateAngleText(textElement, centerX, centerY, x1, y1, x2, y2, radius) {
+                // نقطة المنتصف بين الشعاعين
+                const angle1 = Math.atan2(y1 - centerY, x1 - centerX);
+                const angle2 = Math.atan2(y2 - centerY, x2 - centerX);
+                const midAngle = (angle1 + angle2) / 2;
+                
+                const textX = centerX + (radius + 10) * Math.cos(midAngle);
+                const textY = centerY + (radius + 10) * Math.sin(midAngle);
+                
+                textElement.setAttribute('x', textX);
+                textElement.setAttribute('y', textY);
+            }
+            
+            // عرض توضيحي
+            function runDemo() {
+                let angle = 10;
+                let direction = 1;
+                const demoInterval = setInterval(() => {
+                    angle += direction;
+                    angleControl.value = angle;
+                    
+                    if (angle >= 80) direction = -1;
+                    if (angle <= 10) direction = 1;
+                    
+                    updateSimulation();
+                }, 100);
+                
+                // إيقاف العرض التوضيحي بعد 10 ثوان
+                setTimeout(() => {
+                    clearInterval(demoInterval);
+                }, 10000);
+            }
+            
+            // استماع لأحداث التحكم
+            angleControl.addEventListener('input', updateSimulation);
+            mirrorControl.addEventListener('input', updateSimulation);
+            resetBtn.addEventListener('click', () => {
+                angleControl.value = 45;
+                mirrorControl.value = 0;
+                updateSimulation();
+            });
+            demoBtn.addEventListener('click', runDemo);
+            
+            // التهيئة الأولية
+            updateSimulation();
+        });
+    </script>
+</body>
+</html>

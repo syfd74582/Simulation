@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>محاكاة متطورة لدوران الأرض حول الشمس</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #000;
+            color: #fff;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+        
+        h1 {
+            color: #FFD700;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+        
+        .simulation-container {
+            position: relative;
+            width: 600px;
+            height: 600px;
+            margin: 20px auto;
+        }
+        
+        #solar-system {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        
+        button {
+            background: linear-gradient(to bottom, #4CAF50, #388E3C);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            min-width: 100px;
+        }
+        
+        button:hover {
+            opacity: 0.9;
+        }
+        
+        #speed-control {
+            width: 200px;
+            margin: 0 15px;
+        }
+        
+        .data-panel {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+        
+        .data-card {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px;
+            min-width: 200px;
+            border-left: 4px solid #1E88E5;
+        }
+        
+        .data-label {
+            color: #FFD700;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .chart-container {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px auto;
+            max-width: 800px;
+        }
+        
+        .season-marker {
+            fill: none;
+            stroke: #FF5722;
+            stroke-width: 2;
+        }
+        
+        .season-text {
+            fill: #FF5722;
+            font-size: 12px;
+            text-anchor: middle;
+        }
+        
+        .explanation {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: right;
+            border-right: 4px solid #FFD700;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>محاكاة متطورة لدوران الأرض حول الشمس</h1>
+        
+        <div class="simulation-container">
+            <svg id="solar-system" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600">
+                <!-- خلفية النجوم -->
+                <rect width="100%" height="100%" fill="#000"/>
+                
+                <!-- المدار -->
+                <circle cx="300" cy="300" r="250" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1" stroke-dasharray="5,5"/>
+                
+                <!-- علامات الفصول -->
+                <path class="season-marker" d="M550,300 A250,250 0 0,1 300,550"/>
+                <text x="425" y="425" class="season-text">الشتاء (يناير)</text>
+                
+                <path class="season-marker" d="M300,550 A250,250 0 0,1 50,300"/>
+                <text x="175" y="425" class="season-text">الربيع (أبريل)</text>
+                
+                <path class="season-marker" d="M50,300 A250,250 0 0,1 300,50"/>
+                <text x="175" y="175" class="season-text">الصيف (يوليو)</text>
+                
+                <path class="season-marker" d="M300,50 A250,250 0 0,1 550,300"/>
+                <text x="425" y="175" class="season-text">الخريف (أكتوبر)</text>
+                
+                <!-- الشمس -->
+                <circle cx="300" cy="300" r="40" fill="url(#sun-gradient)">
+                    <animate attributeName="r" values="40;42;40" dur="5s" repeatCount="indefinite"/>
+                </circle>
+                
+                <!-- الأرض -->
+                <g id="earth-group">
+                    <circle id="earth" cx="550" cy="300" r="15" fill="url(#earth-gradient)"/>
+                    <path d="M550,285 L550,295 M545,290 L555,290" stroke="#FFF" stroke-width="1"/>
+                </g>
+                
+                <!-- الظل (للتأثير ثلاثي الأبعاد) -->
+                <defs>
+                    <radialGradient id="sun-gradient" cx="30%" cy="30%" r="70%">
+                        <stop offset="0%" stop-color="#FFD700"/>
+                        <stop offset="50%" stop-color="#FF8C00"/>
+                        <stop offset="100%" stop-color="#FF4500"/>
+                    </radialGradient>
+                    
+                    <radialGradient id="earth-gradient" cx="30%" cy="30%" r="70%">
+                        <stop offset="0%" stop-color="#1E88E5"/>
+                        <stop offset="60%" stop-color="#0D47A1"/>
+                        <stop offset="100%" stop-color="#082766"/>
+                    </radialGradient>
+                    
+                    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+                        <feGaussianBlur stdDeviation="5" result="blur"/>
+                        <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+                    </filter>
+                    
+                    <!-- نمط الخط البياني -->
+                    <pattern id="chart-pattern" patternUnits="userSpaceOnUse" width="20" height="20">
+                        <path d="M0,20 L20,0" stroke="rgba(255,215,0,0.3)" stroke-width="1"/>
+                    </pattern>
+                </defs>
+                
+                <!-- الخط البياني للمسافة -->
+                <path id="distance-chart" fill="none" stroke="#FFD700" stroke-width="2"/>
+                
+                <!-- الخط البياني للسرعة -->
+                <path id="speed-chart" fill="none" stroke="#1E88E5" stroke-width="2"/>
+            </svg>
+        </div>
+        
+        <div class="controls">
+            <button id="start-btn">تشغيل</button>
+            <button id="pause-btn">إيقاف</button>
+            <button id="reset-btn">إعادة ضبط</button>
+            <input type="range" id="speed-control" min="0.1" max="5" step="0.1" value="1">
+            <span id="speed-display">1x</span>
+        </div>
+        
+        <div class="data-panel">
+            <div class="data-card">
+                <div class="data-label">المسافة من الشمس</div>
+                <div id="distance-value">152.1 مليون كم</div>
+                <div id="distance-status">(أوج - أبعد مسافة)</div>
+            </div>
+            <div class="data-card">
+                <div class="data-label">السرعة المدارية</div>
+                <div id="speed-value">29.3 كم/ث</div>
+                <div id="speed-status">(أبطأ سرعة)</div>
+            </div>
+            <div class="data-card">
+                <div class="data-label">الفصل الحالي</div>
+                <div id="season-value" style="color:#FF5722">الصيف</div>
+                <div id="season-date">(يوليو)</div>
+            </div>
+            <div class="data-card">
+                <div class="data-label">اليوم من السنة</div>
+                <div id="day-value">اليوم 172</div>
+                <div id="day-angle">180°</div>
+            </div>
+        </div>
+        
+        <div class="chart-container">
+            <h3>البيانات المدارية على مدار السنة</h3>
+            <svg width="100%" height="200" viewBox="0 0 800 200" preserveAspectRatio="none">
+                <rect width="100%" height="100%" fill="url(#chart-pattern)"/>
+                
+                <!-- محور السينات (الأيام) -->
+                <path d="M50,180 L750,180" stroke="#FFF" stroke-width="1"/>
+                <text x="50" y="195" fill="#FFF" font-size="12">0</text>
+                <text x="200" y="195" fill="#FFF" font-size="12">90</text>
+                <text x="350" y="195" fill="#FFF" font-size="12">180</text>
+                <text x="500" y="195" fill="#FFF" font-size="12">270</text>
+                <text x="650" y="195" fill="#FFF" font-size="12">360</text>
+                <text x="400" y="195" fill="#FFF" font-size="12" text-anchor="middle">أيام السنة</text>
+                
+                <!-- محور العينات (المسافة) -->
+                <path d="M50,180 L50,20" stroke="#FFF" stroke-width="1"/>
+                <text x="35" y="30" fill="#FFD700" font-size="12">152.1</text>
+                <text x="35" y="100" fill="#FFD700" font-size="12">150.0</text>
+                <text x="35" y="170" fill="#FFD700" font-size="12">147.1</text>
+                <text x="10" y="100" fill="#FFD700" font-size="12" transform="rotate(-90,10,100)">المسافة (مليون كم)</text>
+                
+                <!-- محور العينات (السرعة) -->
+                <path d="M750,180 L750,20" stroke="#FFF" stroke-width="1"/>
+                <text x="765" y="30" fill="#1E88E5" font-size="12">30.3</text>
+                <text x="765" y="100" fill="#1E88E5" font-size="12">29.8</text>
+                <text x="765" y="170" fill="#1E88E5" font-size="12">29.3</text>
+                <text x="790" y="100" fill="#1E88E5" font-size="12" transform="rotate(-90,790,100)">السرعة (كم/ث)</text>
+                
+                <!-- خط المسافة -->
+                <path id="live-distance-chart" fill="none" stroke="#FFD700" stroke-width="2" stroke-dasharray="5,5"/>
+                
+                <!-- خط السرعة -->
+                <path id="live-speed-chart" fill="none" stroke="#1E88E5" stroke-width="2" stroke-dasharray="5,5"/>
+            </svg>
+        </div>
+        
+        <div class="explanation">
+            <h3>شرح علمي تفصيلي:</h3>
+            <p><strong>المدار الإهليلجي:</strong> تدور الأرض حول الشمس في مدار بيضاوي الشكل (إهليلجي) وليس دائريًا تمامًا. يسمى أقرب نقطة من الشمس "الحضيض" (147.1 مليون كم) وأبعد نقطة "الأوج" (152.1 مليون كم).</p>
+            <p><strong>قوانين كبلر:</strong> تختلف سرعة الأرض حسب بعدها عن الشمس. تكون أسرع عند الحضيض (30.3 كم/ث) وأبطأ عند الأوج (29.3 كم/ث) وفقًا لقانون كبلر الثاني.</p>
+            <p><strong>الفصول الأربعة:</strong> ينتج تغير الفصول عن ميلان محور الأرض بزاوية 23.5°، وليس بسبب تغير المسافة عن الشمس. عندما يميل القطب الشمالي نحو الشمس يكون صيفًا في نصف الكرة الشمالي.</p>
+            <p><strong>الوحدة الفلكية (AU):</strong> متوسط المسافة بين الأرض والشمس (149.6 مليون كم) تستخدم كوحدة قياس للمسافات في النظام الشمسي.</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // العناصر الرئيسية
+            const earthGroup = document.getElementById('earth-group');
+            const startBtn = document.getElementById('start-btn');
+            const pauseBtn = document.getElementById('pause-btn');
+            const resetBtn = document.getElementById('reset-btn');
+            const speedControl = document.getElementById('speed-control');
+            const speedDisplay = document.getElementById('speed-display');
+            
+            // عناصر البيانات
+            const distanceValue = document.getElementById('distance-value');
+            const distanceStatus = document.getElementById('distance-status');
+            const speedValue = document.getElementById('speed-value');
+            const speedStatus = document.getElementById('speed-status');
+            const seasonValue = document.getElementById('season-value');
+            const seasonDate = document.getElementById('season-date');
+            const dayValue = document.getElementById('day-value');
+            const dayAngle = document.getElementById('day-angle');
+            
+            // الرسوم البيانية
+            const distanceChart = document.getElementById('distance-chart');
+            const speedChart = document.getElementById('speed-chart');
+            const liveDistanceChart = document.getElementById('live-distance-chart');
+            const liveSpeedChart = document.getElementById('live-speed-chart');
+            
+            // الثوابت
+            const centerX = 300;
+            const centerY = 300;
+            const orbitRadius = 250;
+            const earthRadius = 15;
+            const eccentricity = 0.0167; // انحراف مداري الأرض
+            
+            // متغيرات المحاكاة
+            let angle = Math.PI; // تبدأ في الصيف (يوليو)
+            let speed = 1;
+            let isPlaying = false;
+            let animationId = null;
+            let day = 172; // يوليو
+            let distanceData = [];
+            let speedData = [];
+            
+            // تهيئة الرسوم البيانية
+            function initCharts() {
+                const points = 365;
+                distanceData = [];
+                speedData = [];
+                
+                for (let i = 0; i < points; i++) {
+                    const a = (i / points) * 2 * Math.PI;
+                    const r = orbitRadius * (1 - eccentricity * eccentricity) / (1 + eccentricity * Math.cos(a));
+                    const dist = (r / orbitRadius) * 152.1; // تحويل إلى مليون كم
+                    const spd = 30.29 - (Math.cos(a) * 1); // السرعة المدارية
+                    
+                    distanceData.push(dist);
+                    speedData.push(spd);
+                }
+                
+                // رسم الخطوط البيانية
+                updateFullCharts();
+            }
+            
+            // تحديث الرسوم البيانية الكاملة
+            function updateFullCharts() {
+                let distancePath = '';
+                let speedPath = '';
+                
+                for (let i = 0; i < distanceData.length; i++) {
+                    const x = 50 + (i / distanceData.length) * 700;
+                    const distY = 180 - ((distanceData[i] - 147.1) / (152.1 - 147.1)) * 160;
+                    const spdY = 180 - ((speedData[i] - 29.3) / (30.3 - 29.3)) * 160;
+                    
+                    if (i === 0) {
+                        distancePath += `M${x},${distY}`;
+                        speedPath += `M${x},${spdY}`;
+                    } else {
+                        distancePath += ` L${x},${distY}`;
+                        speedPath += ` L${x},${spdY}`;
+                    }
+                }
+                
+                distanceChart.setAttribute('d', distancePath);
+                speedChart.setAttribute('d', speedPath);
+            }
+            
+            // تحديث الرسوم البيانية الحية
+            function updateLiveCharts(progress) {
+                const x = 50 + progress * 700;
+                const distY = 180 - ((parseFloat(distanceValue.textContent) - 147.1) / (152.1 - 147.1)) * 160;
+                const spdY = 180 - ((parseFloat(speedValue.textContent) - 29.3) / (30.3 - 29.3)) * 160;
+                
+                liveDistanceChart.setAttribute('d', `M${x},180 L${x},${distY}`);
+                liveSpeedChart.setAttribute('d', `M${x},180 L${x},${spdY}`);
+            }
+            
+            // تحديث موقع الأرض
+            function updateEarthPosition() {
+                // حساب الموقع في المدار (مدار إهليلجي)
+                const r = orbitRadius * (1 - eccentricity * eccentricity) / (1 + eccentricity * Math.cos(angle));
+                const earthX = centerX + r * Math.cos(angle);
+                const earthY = centerY + r * Math.sin(angle);
+                
+                earthGroup.setAttribute('transform', `translate(${earthX - centerX - orbitRadius}, ${earthY - centerY})`);
+                
+                // تحديث البيانات المعروضة
+                updateDataDisplay(angle, r);
+                
+                // زيادة الزاوية للحركة
+                if (isPlaying) {
+                    angle += 0.005 * speed;
+                    if (angle > 2 * Math.PI) {
+                        angle = 0;
+                        day = 0;
+                    }
+                    
+                    day = (day + 1) % 365;
+                }
+            }
+            
+            // تحديث البيانات المعروضة
+            function updateDataDisplay(angle, r) {
+                // المسافة من الشمس (مليون كم)
+                const distance = (r / orbitRadius) * 152.1;
+                distanceValue.textContent = distance.toFixed(1);
+                
+                // حالة المسافة
+                if (angle >= Math.PI * 0.9 || angle <= Math.PI * 0.1) {
+                    distanceStatus.textContent = "(حضيض - أقرب مسافة)";
+                } else if (angle >= Math.PI * 0.4 && angle <= Math.PI * 0.6) {
+                    distanceStatus.textContent = "(أوج - أبعد مسافة)";
+                } else {
+                    distanceStatus.textContent = "";
+                }
+                
+                // السرعة المدارية (كم/ث)
+                const orbitalSpeed = 30.29 - (Math.cos(angle) * 1);
+                speedValue.textContent = orbitalSpeed.toFixed(1);
+                
+                // حالة السرعة
+                if (angle >= Math.PI * 0.9 || angle <= Math.PI * 0.1) {
+                    speedStatus.textContent = "(أقصى سرعة)";
+                } else if (angle >= Math.PI * 0.4 && angle <= Math.PI * 0.6) {
+                    speedStatus.textContent = "(أبطأ سرعة)";
+                } else {
+                    speedStatus.textContent = "";
+                }
+                
+                // اليوم والفصل
+                dayValue.textContent = `اليوم ${day + 1}`;
+                dayAngle.textContent = `${Math.round(angle * 180 / Math.PI)}°`;
+                
+                // تحديد الفصل
+                if (angle >= 0 && angle < Math.PI/2) {
+                    seasonValue.textContent = "الخريف";
+                    seasonDate.textContent = "(أكتوبر)";
+                } else if (angle >= Math.PI/2 && angle < Math.PI) {
+                    seasonValue.textContent = "الشتاء";
+                    seasonDate.textContent = "(يناير)";
+                } else if (angle >= Math.PI && angle < 3*Math.PI/2) {
+                    seasonValue.textContent = "الربيع";
+                    seasonDate.textContent = "(أبريل)";
+                } else {
+                    seasonValue.textContent = "الصيف";
+                    seasonDate.textContent = "(يوليو)";
+                }
+                
+                // تحديث الرسم البياني الحي
+                updateLiveCharts(angle / (2 * Math.PI));
+            }
+            
+            // التحكم في المحاكاة
+            function startSimulation() {
+                if (!isPlaying) {
+                    isPlaying = true;
+                    startBtn.disabled = true;
+                    pauseBtn.disabled = false;
+                }
+            }
+            
+            function pauseSimulation() {
+                isPlaying = false;
+                startBtn.disabled = false;
+                pauseBtn.disabled = true;
+            }
+            
+            function resetSimulation() {
+                angle = Math.PI;
+                day = 172;
+                updateEarthPosition();
+            }
+            
+            // دورة التحريك
+            function animate() {
+                updateEarthPosition();
+                animationId = requestAnimationFrame(animate);
+            }
+            
+            // استماع لأحداث التحكم
+            startBtn.addEventListener('click', startSimulation);
+            pauseBtn.addEventListener('click', pauseSimulation);
+            resetBtn.addEventListener('click', resetSimulation);
+            
+            speedControl.addEventListener('input', function() {
+                speed = parseFloat(this.value);
+                speedDisplay.textContent = speed + "x";
+            });
+            
+            // التهيئة الأولية
+            initCharts();
+            updateEarthPosition();
+            pauseSimulation(); // تبدأ متوقفة
+            animate();
+        });
+    </script>
+</body>
+</html>

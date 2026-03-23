@@ -1,0 +1,173 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>محاكاة إطلاق قمر صناعي</title>
+    <link href="./assets/satellite.ico" rel="shortcut icon">
+    <link href="./assets/satellite.ico" rel="icon">
+    <link href="https://fonts.googleapis.com/css?family=M+PLUS+1p:400,500" rel="stylesheet">
+    <link href="style.css" rel="stylesheet">
+</head>
+<body>
+
+    <svg class="initSVG">
+        <path class="bgPath" fill="#FFFFFFaa" fill-rule="evenodd"/>
+        <text>
+            أدخل سرعة الإطلاق والارتفاع. ثم انقر على زر "إطلاق" لتشغيل المحاكاة.
+        </text>
+
+        <path class="arrowPath" fill="orangered"></path>
+        <path class="arrowPath" fill="orangered" filter="blur(5px)"></path>
+        
+    </svg>
+    
+    <div class="questionSymbolHolder">
+        <svg class="questionSymbol" width="30" height="30" viewBox="0 0 512 512">
+            <g fill="#ffffff" transform="translate(42.666667, 42.666667)">
+                <path d="M291.76704,163.504 C291.76704,177.01952 288.33216,188.82176 281.479253,198.90112 C275.828267,207.371093 266.358187,216.549547 253.042987,226.434987 C245.378987,231.682347 240.331947,236.618667 237.916587,241.257813 C234.87744,246.90624 233.376213,255.371093 233.376213,266.666667 L190.710827,266.666667 C190.710827,249.530027 192.53504,237.027413 196.165333,229.162667 C200.394453,219.679573 209.571627,210.098773 223.686187,200.42048 C230.350293,195.374933 235.188693,190.2368 238.214827,184.994773 C241.839787,179.143253 243.664,172.49216 243.664,165.028693 C243.664,153.13024 240.125013,144.26304 233.070293,138.404907 C227.4336,134.177067 220.56768,132.059947 212.501333,132.059947 C199.39328,132.059947 189.911467,136.398507 184.065067,145.069013 C179.829333,151.518293 177.7056,159.787733 177.7056,169.868587 L177.7056,170.173227 L132.34368,170.173227 C132.34368,143.751253 140.703147,123.790507 157.43488,110.274773 C171.554773,98.9922133 189.007787,93.3346133 209.77344,93.3346133 C227.933653,93.3346133 243.865813,96.86848 257.571627,103.9232 C280.37504,115.62624 291.76704,135.494827 291.76704,163.504 Z M426.666667,213.333333 C426.666667,331.153707 331.153707,426.666667 213.333333,426.666667 C95.51296,426.666667 3.55271368e-14,331.153707 3.55271368e-14,213.333333 C3.55271368e-14,95.51168 95.51296,3.55271368e-14 213.333333,3.55271368e-14 C331.153707,3.55271368e-14 426.666667,95.51168 426.666667,213.333333 Z M384,213.333333 C384,119.226667 307.43872,42.6666667 213.333333,42.6666667 C119.227947,42.6666667 42.6666667,119.226667 42.6666667,213.333333 C42.6666667,307.43872 119.227947,384 213.333333,384 C307.43872,384 384,307.43872 384,213.333333 Z M213.332053,282.666667 C198.60416,282.666667 186.665387,294.60544 186.665387,309.333333 C186.665387,324.061227 198.60416,336 213.332053,336 C228.059947,336 239.99872,324.061227 239.99872,309.333333 C239.99872,294.60544 228.059947,282.666667 213.332053,282.666667 Z"/>
+            </g>
+        </svg>
+    
+        <div class="about">حول هذا التطبيق.</div>
+    </div>
+
+    <div class="instructionBG"></div>
+    <div class="instruction">
+        <svg class="close" width="20" height="20">
+            <rect x="1" y="1" rx="5" ry="5" width="18" height="18"/>
+            <path d="M5 5 l10 10"/>
+            <path d="M15 5 l-10 10"/>
+        </svg>
+        <script src="./js/include.js"></script>
+    </div>
+
+    <canvas class="history"></canvas>
+    
+    <div class="flex">
+        
+        <div class="left">
+            <div class="leftTop">
+                <label>سرعة الإطلاق [م/ث]</label>
+                <input type="number" name="velo" value="1000" required/>
+                <label>ارتفاع الإطلاق [كم]</label>
+                <label class="outOfRange">خارج النطاق!</label>
+                <input type="number" name="alt" value="1000" required/>
+                <div class="buttonFlex">
+                    <input class="launchBtn" type="submit" value="إطلاق"/>
+                    <input class="abortBtn" type="submit" value="إلغاء" disabled/>
+                </div>
+            </div>
+
+            <hr/>
+                
+            <div class="leftBottom">
+                <div>سرعة الإطلاق:</div>
+                <div class="toRight"><span class="initVelo"></span>&nbsp;[م/ث]</div>
+
+                <div>ارتفاع الإطلاق:</div>
+                <div class="toRight"><span class="initAlt"></span>&nbsp;[كم]</div>
+
+                <div class="use2columns timeFlex">
+                    <div>الوقت:</div>
+                    <div class="time">-</div>
+                </div>
+
+                <div>الارتفاع:</div>
+                <div class="toRight"><span class="alt">-</span>&nbsp;[كم]</div>
+
+                <div class="use2columns">تسارع الجاذبية:</div>
+
+                <div class="use2columns toRight">ج =&nbsp;
+                    <span class="gravity">-</span>&nbsp;[م/ث²]
+                </div>
+            </div>
+        </div>
+            
+        <div class="middle">
+            <div class="arrowDown">
+                <svg width="60" height="50">
+                    <path class="arrowShadow" d="M10 10 l5 0 l15 15 l15 -15 l5 0 l-20 20 Z" fill="white" filter="blur(7px)"/>
+                    <path class="arrowShadow" d="M10 20 l5 0 l15 15 l15 -15 l5 0 l-20 20 Z" fill="white" filter="blur(7px)"/>
+                    <path d="M10 10 l5 0 l15 15 l15 -15 l5 0 l-20 20 Z" fill="white"/>
+                    <path d="M10 20 l5 0 l15 15 l15 -15 l5 0 l-20 20 Z" fill="white"/>
+                </svg>
+                <div class="arrowDownMssg arrowShadow">اختر كوكبًا أو نجمًا آخر</div>
+            </div>
+            <div class="arrowUp">
+                <svg width="60" height="50">
+                    <path d="M10 40 l5 0 l15 -15 l15 15 l5 0 l-20 -20 Z" fill="white"/>
+                    <path d="M10 30 l5 0 l15 -15 l15 15 l5 0 l-20 -20 Z" fill="white"/>
+                    <path class="arrowShadow" d="M10 40 l5 0 l15 -15 l15 15 l5 0 l-20 -20 Z" fill="white" filter="blur(7px)"/>
+                    <path class="arrowShadow" d="M10 30 l5 0 l15 -15 l15 15 l5 0 l-20 -20 Z" fill="white" filter="blur(7px)"/>
+                </svg>
+            </div>
+            
+            <div class="scrollBar">
+                <div class="scale">
+                    <svg class="svgArrowLeft" width="10" height="8">
+                        <path d="M10 0 l-10 3 l10 2" stroke="white" fill="none">
+                    </svg>
+                    <svg class="svgArrowRight" width="10" height="8">
+                        <path d="M0 0 l10 3 l-10 2" stroke="white" fill="none">
+                    </svg>
+                    <div class="innerScale"></div>
+                </div>
+                <input type="range" min=0 max=300 value="0"/>
+            </div>
+            <ul class="planetList">
+                <!-- سيتم ملء هذه القائمة بالكواكب والنجوم بالعربية -->
+            </ul>
+        </div>
+            
+        <div class="right">
+            <div class="rightTop">
+                <div class="planetName"></div>
+                <div class="planetDescription"></div>
+            </div>
+
+            <div class="rightBottom">
+                <div>
+                    <div><b>القطر:</b></div>
+                    <div>ن = <span class="diaSpan"></span></div>
+                </div>
+
+                <div>
+                    <div><b>الكتلة:</b></div>
+                    <div>ك = <span class="massSpan"></span>x10<sup class="massSup"></sup>&nbsp;[كغ]</div>
+                </div>
+
+                <div>
+                    <div><b>ثابت الجاذبية:</b></div>
+                    <div>ج = 6.67x10<sup>-11</sup>&nbsp;[م³/كغ/ث²]</div>
+                </div>
+
+                <div>
+                    <div><b>تسارع الجاذبية:</b></div>
+                    <div>ج = كج/ن²&nbsp;[م/ث²]</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="satellite">
+        <img class="satelliteImg" src="./assets/satellite.png"/>
+        <img class="launchDirectionImg" src="./assets/rightArrow.svg"/>
+        <div class="showInitParams">
+            <div>سرعة الإطلاق: <span class="showInitVelo">1,000</span>&nbsp;[م/ث]</div>
+            <div>ارتفاع الإطلاق: <span class="showInitAlt">1,000</span>&nbsp;[كم]</div>
+        </div>
+    </div>
+
+    <div class="scale_testing_purpose_only" style='display:none'></div>
+
+    <div class="planetContainer">
+        <img src="./assets/earth.png"/>
+    </div>
+
+    <script src="./js/jquery-3.7.1.min.js"></script>
+    <script type="module" src="./js/main.js"></script>
+    <script type="module" src="./js/launch.js"></script>
+
+</body>
+</html>

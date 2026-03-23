@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>دورة الأكسجين وثاني أكسيد الكربون</title>
+    <style>
+        body {
+            font-family: 'Tajawal', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to bottom, #87CEEB 0%, #E0F7FA 50%, #8BC34A 100%);
+            min-height: 100vh;
+            color: #333;
+            text-align: center;
+            overflow-x: hidden;
+        }
+        
+       #simulation-container {
+    width: 900px;
+    height: 800px;
+    margin: 20px auto;
+    position: relative;
+    background-color: #e8f4f8; /* لون الخلفية الأساسي */
+    
+    background-size: cover; /* لتغطية كامل المساحة */
+    background-position: center; /* لمركز الصورة */
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    margin-bottom: 0px;
+}
+
+#simulation {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, #87CEEB 0%, #E0F7FA 50%, #8BC34A 100%);
+            
+    background-image: url("/Plat.jpg"); /* رابط الصورة */
+    background-size: cover; /* لتغطية كامل المساحة */
+    background-position: center; /* لمركز الصورة */
+}
+
+        #controls {
+            margin: 20px auto;
+            padding: 15px;
+            background-color: #d4edff;
+            border-radius: 10px;
+            width: 700px;
+        }
+        button {
+            padding: 10px 15px;
+            margin: 5px;
+            background-color: #2c7be5;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #1a68d1;
+        }
+        .info-panel {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            right: 10px;
+            background-color: rgba(255,255,255,0.9);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .title {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        .process-label {
+            font-weight: bold;
+            font-size: 18px;
+            fill: #333;
+        }
+        .arrow {
+            stroke-width: 2;
+            marker-end: url(#arrowhead);
+            animation: flow 2s infinite;
+        }
+        @keyframes flow {
+            0% { stroke-dashoffset: 10; }
+            100% { stroke-dashoffset: 0; }
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="container">
+        <h1>🌱تبادل الغازات بين الإنسان والنبات👨</h1>
+    
+    <div id="simulation-container">
+       <svg id="simulation" width="100%" height="100%">
+                <defs>
+                    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#3498db"/>
+                    </marker>
+                    <linearGradient id="sunGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#FFD700"/>
+                        <stop offset="100%" stop-color="#FF8C00"/>
+                    </linearGradient>
+                </defs>
+                <!-- الخلفية -->
+            <rect width="100%" height="100%" fill="#e8f4f8" />
+                <!-- الأرض -->
+                <rect x="0" y="400" width="100%" height="100" fill="#8BC34A" />
+               
+            <!-- الشمس -->
+            <circle id="sun" cx="150" cy="100" r="60" fill="url(#sunGradient)" />
+            <circle cx="150" cy="100" r="50" fill="#FFEE58" opacity="0.8" />
+            
+            <!-- أشعة الشمس -->
+            <g id="sun-rays">
+                <line x1="150" y1="40" x2="150" y2="20" stroke="#FFD700" stroke-width="3" stroke-linecap="round"/>
+                <line x1="190" y1="70" x2="210" y2="60" stroke="#FFD700" stroke-width="3" stroke-linecap="round"/>
+                <line x1="210" y1="100" x2="230" y2="100" stroke="#FFD700" stroke-width="3" stroke-linecap="round"/>
+                <line x1="190" y1="130" x2="210" y2="140" stroke="#FFD700" stroke-width="3" stroke-linecap="round"/>
+                <line x1="150" y1="160" x2="150" y2="180" stroke="#FFD700" stroke-width="3" stroke-linecap="round"/>
+                <line x1="110" y1="130" x2="90" y2="140" stroke="#FFD700" stroke-width="3" stroke-linecap="round"/>
+                <line x1="90" y1="100" x2="70" y2="100" stroke="#FFD700" stroke-width="3" stroke-linecap="round"/>
+                <line x1="110" y1="70" x2="90" y2="60" stroke="#FFD700" stroke-width="3" stroke-linecap="round"/>
+            </g>
+            
+            <!-- النبات -->
+            <g id="plant-group">
+
+    <image href="./Plant4.png" x="270" y="220" width="220" height="220" />
+</g>
+
+
+            
+            
+            <!-- الإنسان -->
+            <g id="human-group">
+    <image href="./Person.png" x="570" y="220" width="220" height="220" />
+</g>
+
+            <!-- التسميات التوضيحية -->
+            <text x="150" y="50" text-anchor="middle" class="process-label">الشمس</text>
+            <text x="400" y="520" text-anchor="middle" class="process-label">النبات</text>
+            <text x="700" y="420" text-anchor="middle" class="process-label">الإنسان</text>
+            
+            <!-- الأسهم والمسارات -->
+            <g id="arrows-group">
+                <!-- ضوء الشمس إلى النبات -->
+                <path id="sun-to-plant" d="M200,120 Q300,150 370,250" fill="none" stroke="#FFD700" stroke-width="3" 
+                      stroke-dasharray="5,3" class="arrow" opacity="0"/>
+                
+                <!-- الأكسجين من النبات إلى الإنسان -->
+                <path id="oxygen-path" d="M430,300 Q550,250 670,240" fill="none" stroke="#66B2FF" stroke-width="50" 
+                      stroke-dasharray="5,3" class="arrow" opacity="0"/>
+                
+                <!-- ثاني أكسيد الكربون من الإنسان إلى النبات -->
+                <path id="co2-path" d="M670,280 Q550,350 430,350" fill="none" stroke="#A0A0A0" stroke-width="3" 
+                      stroke-dasharray="5,3" class="arrow" opacity="0"/>
+            </g>
+            
+            <!-- الجزيئات المتحركة -->
+            <g id="molecules-group">
+                <!-- جزيئات الضوء (الطاقة) -->
+                <g id="light-particles" opacity="0">
+                    <circle class="light-particle" cx="0" cy="0" r="3" fill="#FFD700"/>
+                    <circle class="light-particle" cx="0" cy="0" r="3" fill="#FFD700"/>
+                    <circle class="light-particle" cx="0" cy="0" r="3" fill="#FFD700"/>
+                </g>
+                
+                <!-- جزيئات الأكسجين -->
+                <g id="oxygen-molecules">
+                    <!-- سيتم إضافتها ديناميكياً -->
+                </g>
+                
+                <!-- جزيئات ثاني أكسيد الكربون -->
+                <g id="co2-molecules">
+                    <!-- سيتم إضافتها ديناميكياً -->
+                </g>
+            </g>
+            
+            <!-- التسميات العلمية -->
+            <g id="science-labels" font-size="14" fill="#333">
+                <text x="280" y="130" text-anchor="middle">الطاقة الضوئية</text>
+                <text x="550" y="200" text-anchor="middle">O₂ الأكسجين</text>
+                <text x="550" y="380" text-anchor="middle">CO₂ ثاني أكسيد الكربون</text>
+            </g>
+        </svg>
+    
+        
+        <div class="info-panel">
+            <p id="info-text">انقر على "بدء المحاكاة" لمشاهدة دورة الأكسجين وثاني أكسيد الكربون بين الإنسان والنبات</p>
+            <div id="process-explanation"></div>
+        </div>
+    </div>
+    
+    <div id="controls">
+        <button id="start-btn">بدء المحاكاة</button>
+        <button id="step1-btn">التمثيل الضوئي</button>
+        <button id="step2-btn">التنفس</button>
+        <button id="reset-btn">إعادة تعيين</button>
+    </div>
+    
+    
+    <div>
+    <h2>تبادل الغازات بين الإنسان والنبات</h2>
+    <p>
+        عملية تبادل الغازات بين الإنسان والنبات تشمل تبادل الأكسجين وثاني أكسيد الكربون، وتعتبر جزءًا أساسيًا من النظام البيئي. إليك تفاصيل هذه العملية:
+    </p>
+    <h3>1. التمثيل الضوئي في النباتات</h3>
+    <ul>
+        <li><strong>المدخلات:</strong> تمتص النباتات ثاني أكسيد الكربون (CO₂) من الهواء ويمتص الماء (H₂O) من التربة.</li>
+        <li><strong>العمليات:</strong> تستخدم الطاقة الشمسية لتحويل هذه المدخلات إلى جلوكوز (C₆H₁₂O₆) والأكسجين (O₂) من خلال عملية التمثيل الضوئي.</li>
+        <li><strong>النتائج:</strong> تنتج النباتات الأكسجين كمنتج ثانوي، الذي يُطلق في الهواء.</li>
+    </ul>
+    <h3>2. التنفس في الإنسان</h3>
+    <ul>
+        <li><strong>المدخلات:</strong> يستنشق الإنسان الأكسجين من الهواء.</li>
+        <li><strong>العمليات:</strong> يستخدم الأكسجين لتحطيم الجلوكوز في عملية التنفس الخلوي، مما يحرر الطاقة اللازمة لعمليات الجسم.</li>
+        <li><strong>النتائج:</strong> ينتج عن هذه العملية ثاني أكسيد الكربون والماء كمنتجات ثانوية، يُخرجها الإنسان إلى الهواء عند الزفير.</li>
+    </ul>
+    <h3>3. التبادل الغازي</h3>
+    <p>
+        بين النباتات والإنسان:
+        <ul>
+            <li><strong>النباتات:</strong> تمتص CO₂ الذي ينتجه الإنسان، وتوفر O₂ الذي يحتاجه الإنسان.</li>
+            <li><strong>الإنسان:</strong> يستنشق O₂ ويخرج CO₂، مما يساهم في دورة حياة كلاً من الكائنين.</li>
+        </ul>
+    </p>
+    <h3>4. أهمية التبادل</h3>
+    <ul>
+        <li><strong>الحفاظ على التوازن:</strong> يساهم هذا التبادل في الحفاظ على توازن مستويات الغازات في الغلاف الجوي.</li>
+        <li><strong>دعم الحياة:</strong> يوفر الأكسجين الذي تحتاجه جميع الكائنات الحية، ويقلل من مستويات ثاني أكسيد الكربون.</li>
+    </ul>
+    <p>
+        تعتبر عملية تبادل الغازات بين الإنسان والنبات أساسية لدعم الحياة على الأرض، حيث تعزز التوازن البيئي وتضمن استمرارية الحياة لكلا الكائنين.
+    </p>
+</div>
+
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const svg = document.getElementById('simulation');
+            const oxygenGroup = document.getElementById('oxygen-molecules');
+            const co2Group = document.getElementById('co2-molecules');
+            const lightParticles = document.getElementById('light-particles');
+            const infoText = document.getElementById('info-text');
+            const processExplanation = document.getElementById('process-explanation');
+            const startBtn = document.getElementById('start-btn');
+            const step1Btn = document.getElementById('step1-btn');
+            const step2Btn = document.getElementById('step2-btn');
+            const resetBtn = document.getElementById('reset-btn');
+            
+            const sunToPlantArrow = document.getElementById('sun-to-plant');
+            const oxygenPath = document.getElementById('oxygen-path');
+            const co2Path = document.getElementById('co2-path');
+            
+            let animationId;
+            let currentStep = 0;
+            let molecules = [];
+            
+            // إنشاء جزيء أكسجين (O2)
+            function createOxygen(x, y) {
+                const oxygen = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                oxygen.classList.add('molecule');
+                oxygen.setAttribute('transform', `translate(${x}, ${y})`);
+                
+                // ذرتان من الأكسجين
+                const circle1 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                circle1.setAttribute('cx', 0);
+                circle1.setAttribute('cy', 0);
+                circle1.setAttribute('r', 8);
+                circle1.setAttribute('fill', '#66B2FF');
+                
+                const circle2 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                circle2.setAttribute('cx', 12);
+                circle2.setAttribute('cy', 0);
+                circle2.setAttribute('r', 8);
+                circle2.setAttribute('fill', '#66B2FF');
+                
+                
+                
+                // خط يربط بين الذرتين
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', 8);
+                line.setAttribute('y1', 0);
+                line.setAttribute('x2', 12);
+                line.setAttribute('y2', 0);
+                line.setAttribute('stroke', '#3399FF');
+                line.setAttribute('stroke-width', '2');
+                
+                // إنشاء رمز العنصر الكيميائي (O₂)
+    const symbol = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    symbol.classList.add('molecule-symbol');
+    symbol.setAttribute('x', 8);
+    symbol.setAttribute('y', 20);
+    symbol.setAttribute('text-anchor', 'middle');
+    symbol.setAttribute('dominant-baseline', 'middle');
+    symbol.textContent = 'O₂';
+    symbol.style.animation = 'fadeIn 1s forwards';
+                
+                oxygen.appendChild(circle1);
+                oxygen.appendChild(circle2);
+                oxygen.appendChild(line);
+                oxygen.appendChild(symbol);
+                oxygenGroup.appendChild(oxygen);
+                
+                return {
+                    element: oxygen,
+                    x: x,
+                    y: y,
+                    type: 'oxygen',
+                    path: oxygenPath,
+                    pathProgress: 0
+                };
+            
+            }
+            // إنشاء جزيء ثاني أكسيد الكربون (CO2)
+            function createCO2(x, y) {
+                const co2 = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                co2.classList.add('molecule');
+                co2.setAttribute('transform', `translate(${x}, ${y})`);
+                
+                // ذرة كربون
+                const carbon = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                carbon.setAttribute('cx', 0);
+                carbon.setAttribute('cy', 0);
+                carbon.setAttribute('r', 10);
+                carbon.setAttribute('fill', '#A0A0A0');
+                
+                // ذرتان من الأكسجين
+                const oxygen1 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                oxygen1.setAttribute('cx', -15);
+                oxygen1.setAttribute('cy', 0);
+                oxygen1.setAttribute('r', 8);
+                oxygen1.setAttribute('fill', '#66B2FF');
+                
+                const oxygen2 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                oxygen2.setAttribute('cx', 15);
+                oxygen2.setAttribute('cy', 0);
+                oxygen2.setAttribute('r', 8);
+                oxygen2.setAttribute('fill', '#66B2FF');
+                
+                // خطوط تربط الذرات
+                const line1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line1.setAttribute('x1', -10);
+                line1.setAttribute('y1', 0);
+                line1.setAttribute('x2', -15);
+                line1.setAttribute('y2', 0);
+                line1.setAttribute('stroke', '#3399FF');
+                line1.setAttribute('stroke-width', '2');
+                
+                const line2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line2.setAttribute('x1', 10);
+                line2.setAttribute('y1', 0);
+                line2.setAttribute('x2', 15);
+                line2.setAttribute('y2', 0);
+                line2.setAttribute('stroke', '#3399FF');
+                line2.setAttribute('stroke-width', '2');
+                
+                const symbol = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    symbol.classList.add('molecule-symbol');
+    symbol.setAttribute('x', 8);
+    symbol.setAttribute('y', 20);
+    symbol.setAttribute('text-anchor', 'middle');
+    symbol.setAttribute('dominant-baseline', 'middle');
+    symbol.textContent = 'CO₂';
+    symbol.style.animation = 'fadeIn 1s forwards';
+                
+                co2.appendChild(carbon);
+                co2.appendChild(oxygen1);
+                co2.appendChild(oxygen2);
+                co2.appendChild(line1);
+                co2.appendChild(line2);
+                co2.appendChild(symbol);
+                co2Group.appendChild(co2);
+                
+                
+                
+                return {
+                    element: co2,
+                    x: x,
+                    y: y,
+                    type: 'co2',
+                    path: co2Path,
+                    pathProgress: 0
+                };
+            }
+            
+            // إنشاء جزيئات ضوئية
+            function createLightParticles() {
+                const particles = lightParticles.querySelectorAll('.light-particle');
+                particles.forEach((particle, index) => {
+                    const angle = (index / particles.length) * Math.PI * 2;
+                    particle.setAttribute('cx', 150 + Math.cos(angle) * 60);
+                    particle.setAttribute('cy', 100 + Math.sin(angle) * 60);
+                });
+                lightParticles.setAttribute('opacity', '1');
+            }
+            
+            // تحريك الجزيئات على المسار
+            function moveMoleculesOnPath() {
+                molecules.forEach(molecule => {
+                    if (molecule.pathProgress <= 1) {
+                        molecule.pathProgress += 0.002;
+                        
+                        // حساب النقطة على المسار
+                        const path = molecule.path;
+                        const pathLength = path.getTotalLength();
+                        const point = path.getPointAtLength(pathLength * molecule.pathProgress);
+                        
+                        // تحديث موضع الجزيء
+                        molecule.x = point.x;
+                        molecule.y = point.y;
+                        molecule.element.setAttribute('transform', `translate(${point.x}, ${point.y})`);
+                        
+                        // إظهار المسار عند بدء الحركة
+                        if (molecule.pathProgress > 0.02 && molecule.path.getAttribute('opacity') !== '1') {
+                            molecule.path.setAttribute('opacity', '1');
+                        }
+                    }
+                });
+                
+                // إزالة الجزيئات التي أكملت مسارها
+                molecules = molecules.filter(molecule => molecule.pathProgress <= 1);
+                
+                // إذا كانت هناك جزيئات تتحرك، استمر في التحريك
+                if (molecules.length > 0) {
+                    animationId = requestAnimationFrame(moveMoleculesOnPath);
+                } else {
+                    // إذا انتهت جميع الجزيئات، انتقل إلى الخطوة التالية
+                    if (currentStep === 1) {
+                        setTimeout(startRespiration, 1000);
+                    } else if (currentStep === 2) {
+                        setTimeout(startPhotosynthesis, 1000);
+                    }
+                }
+            }
+            
+            // بدء التمثيل الضوئي
+            function startPhotosynthesis() {
+                currentStep = 1;
+                infoText.textContent = "التمثيل الضوئي: النبات يمتص ثاني أكسيد الكربون والطاقة الضوئية لينتج الأكسجين والجلوكوز";
+                processExplanation.innerHTML = `
+                    <h3>التمثيل الضوئي</h3>
+                    <p>6CO₂ + 6H₂O + ضوء الشمس → C₆H₁₂O₆ + 6O₂</p>
+                    <p>يمتص النبات ثاني أكسيد الكربون من الجو والماء من التربة، ويستخدم الطاقة الشمسية لإنتاج الجلوكوز والأكسجين.</p>
+                `;
+                
+                // إظهار سهم ضوء الشمس
+                sunToPlantArrow.setAttribute('opacity', '1');
+                
+                // إنشاء جزيئات ضوئية
+                createLightParticles();
+                
+                // تحريك جزيئات الضوء نحو النبات
+                setTimeout(() => {
+                    lightParticles.setAttribute('opacity', '0');
+                    
+                    // بعد وصول الضوء، إنشاء جزيئات الأكسجين
+                    setTimeout(() => {
+                        for (let i = 0; i < 5; i++) {
+                            molecules.push(createOxygen(430, 300));
+                        }
+                        moveMoleculesOnPath();
+                    }, 500);
+                }, 1500);
+            }
+            
+            // بدء التنفس
+            function startRespiration() {
+                currentStep = 2;
+                infoText.textContent = "التنفس: الإنسان يستنشق الأكسجين ويطلقه كثاني أكسيد الكربون بعد استخدامه في إنتاج الطاقة";
+                processExplanation.innerHTML = `
+                    <h3>التنفس الخلوي</h3>
+                    <p>C₆H₁₂O₆ + 6O₂ → 6CO₂ + 6H₂O + طاقة (ATP)</p>
+                    <p>يستخدم الإنسان الأكسجين لتفكيك الجلوكوز وإنتاج ثاني أكسيد الكربون والماء والطاقة.</p>
+                `;
+                
+                // إنشاء جزيئات ثاني أكسيد الكربون
+                for (let i = 0; i < 5; i++) {
+                    molecules.push(createCO2(670, 280));
+                }
+                moveMoleculesOnPath();
+            }
+            
+            // بدء المحاكاة الكاملة
+            function startFullSimulation() {
+                resetSimulation();
+                startPhotosynthesis();
+            }
+            
+            // إعادة تعيين المحاكاة
+            function resetSimulation() {
+                cancelAnimationFrame(animationId);
+                currentStep = 0;
+                
+                // إخفاء جميع الأسهم
+                sunToPlantArrow.setAttribute('opacity', '0');
+                oxygenPath.setAttribute('opacity', '0');
+                co2Path.setAttribute('opacity', '0');
+                
+                // إخفاء جزيئات الضوء
+                lightParticles.setAttribute('opacity', '0');
+                
+                // مسح الجزيئات
+                while (oxygenGroup.firstChild) {
+                    oxygenGroup.removeChild(oxygenGroup.firstChild);
+                }
+                
+                while (co2Group.firstChild) {
+                    co2Group.removeChild(co2Group.firstChild);
+                }
+                
+                molecules = [];
+                infoText.textContent = "انقر على أحد الأزرار لبدء المحاكاة";
+                processExplanation.innerHTML = "";
+            }
+            
+            // إضافة مستمعي الأحداث
+            startBtn.addEventListener('click', startFullSimulation);
+            step1Btn.addEventListener('click', startPhotosynthesis);
+            step2Btn.addEventListener('click', startRespiration);
+            resetBtn.addEventListener('click', resetSimulation);
+        });
+    </script>
+</body>
+</html>

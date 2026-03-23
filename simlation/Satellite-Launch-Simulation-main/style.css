@@ -1,0 +1,645 @@
+body {
+  background-color: #000000;
+  position: relative;
+  margin: 0;
+  overflow: hidden;
+  height: 100vh;
+  font-family: Helvetica, Arial, serif, "Times New Roman", Times;
+}
+body .initSVG {
+  overflow: visible;
+  position: absolute;
+  top: 0;
+  left: 0;
+  transition: all 1s ease-in-out;
+  opacity: 0;
+  z-index: 4;
+}
+@keyframes blink {
+  0% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.2;
+  }
+}
+body .initSVG text {
+  font-weight: 900;
+}
+body .initSVG text, body .initSVG .arrowPath {
+  animation-name: blink;
+  animation-duration: 2s;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+body .questionSymbolHolder {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: -moz-fit-content;
+  width: fit-content;
+  height: 30px;
+  z-index: 3;
+  transition: all ease-out 1s;
+}
+body .questionSymbolHolder:hover #add {
+  fill: #646cd6;
+}
+body .questionSymbolHolder:hover .about {
+  opacity: 1;
+}
+body .questionSymbolHolder .questionSymbol #add {
+  transition: all ease-in-out 0.3s;
+}
+body .questionSymbolHolder .about {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  left: 35px;
+  color: #646cd6;
+  width: 150px;
+  opacity: 0;
+  transition: all ease-in-out 0.3s;
+  pointer-events: none;
+}
+body .instruction {
+  position: absolute;
+  opacity: 0;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 70%;
+  background-color: darkgrey;
+  z-index: 3;
+  border: 1px solid #dddddd;
+  border-radius: 15px;
+  transition: all ease-out 1s;
+  padding: 0 30px;
+  box-sizing: border-box;
+}
+body .instruction .close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+body .instruction .close:hover rect, body .instruction .close:hover path {
+  stroke: #444444;
+}
+body .instruction .close rect, body .instruction .close path {
+  fill: none;
+  stroke: grey;
+  stroke-width: 2px;
+}
+body .instruction p {
+  font-size: 1.1em;
+}
+body .instruction .parentFlex {
+  display: flex;
+  justify-content: center;
+  width: -moz-fit-content;
+  width: fit-content;
+  margin: 0 auto;
+  background-color: rgba(99, 107, 216, 0.337254902);
+  padding: 10px 30px;
+}
+body .instruction .parentFlex .formulaFlex {
+  font-style: italic;
+  width: -moz-fit-content;
+  width: fit-content;
+  display: flex;
+  align-items: center;
+  margin-right: 50px;
+  font-size: 1.2em;
+}
+body .instruction .parentFlex .formulaFlex div {
+  margin: 0 3px;
+}
+body .instruction .parentFlex .formulaFlex .MG {
+  border-bottom: 1px solid black;
+}
+body .instruction .parentFlex .params div {
+  text-align: left;
+}
+body .instructionBG {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  width: 100%;
+  height: 100vh;
+  background-color: rgba(116, 169, 216, 0.3411764706);
+  z-index: 3;
+  color: white;
+  display: none;
+  transition: all ease-out 1s;
+}
+body .history {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1;
+}
+body .flex {
+  position: relative;
+  height: 100vh;
+  color: rgba(255, 255, 255, 0.7);
+}
+body .flex .left, body .flex .right {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 250px;
+  height: 350px;
+  background-color: rgba(220, 223, 255, 0.3);
+  z-index: 2;
+  padding: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-sizing: border-box;
+  transition-property: all;
+  transition-timing-function: ease-out;
+  transition-duration: 0.7s;
+}
+body .flex .left {
+  left: 20px;
+}
+@keyframes blink {
+  0% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.2;
+  }
+}
+body .flex .left .instructionSVG {
+  overflow: visible;
+  position: absolute;
+  top: 0;
+  right: -100%;
+  transition: opacity 1s ease-out;
+}
+body .flex .left .instructionSVG path, body .flex .left .instructionSVG text {
+  animation-name: blink;
+  animation-duration: 2s;
+  animation-fill-mode: both;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+body .flex .left .leftTop {
+  width: 100%;
+  text-align: center;
+  margin: 10px auto;
+}
+body .flex .left .leftTop label {
+  display: block;
+}
+body .flex .left .leftTop .outOfRange {
+  color: rgb(255, 60, 60);
+  display: none;
+}
+body .flex .left .leftTop input[type=number] {
+  display: block;
+  margin: 0 auto;
+  margin-bottom: 10px;
+  width: 60%;
+  border: 2px solid transparent;
+}
+body .flex .left .leftTop input[type=number]:focus {
+  outline: none;
+}
+body .flex .left .leftTop input::-webkit-outer-spin-button,
+body .flex .left .leftTop input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+body .flex .left .leftTop .buttonFlex {
+  display: flex;
+  justify-content: center;
+  margin: 15px 0;
+}
+body .flex .left .leftTop .buttonFlex input[type=submit] {
+  width: 40%;
+  color: #ffffff;
+  font-size: 1rem;
+  padding: 2px;
+  border: 1px solid rgba(180, 180, 180, 0.384);
+  border-radius: 5px;
+}
+body .flex .left .leftTop .buttonFlex .launchBtn:disabled, body .flex .left .leftTop .buttonFlex .abortBtn:disabled {
+  background-color: rgb(110, 110, 110);
+  color: rgb(70, 70, 70);
+  pointer-events: none;
+}
+body .flex .left .leftTop .buttonFlex .abortBtn {
+  background-color: rgb(228, 42, 42);
+}
+body .flex .left .leftTop .buttonFlex .abortBtn:hover {
+  background-color: rgb(189, 35, 35);
+}
+body .flex .left .leftTop .buttonFlex .launchBtn {
+  margin-right: 10px;
+  background-color: rgb(53, 211, 32);
+}
+body .flex .left .leftTop .buttonFlex .launchBtn:hover {
+  background-color: rgb(41, 168, 25);
+}
+body .flex .left hr {
+  border: none;
+  border-top: 1px solid grey;
+}
+body .flex .left .leftBottom {
+  display: grid;
+  grid-template-columns: 70% 30%;
+  grid-template-columns: 135px 80px;
+  grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr;
+  row-gap: 6px;
+  align-items: center;
+  width: -moz-fit-content;
+  width: fit-content;
+  margin: 0 auto;
+}
+body .flex .left .leftBottom .use2columns {
+  grid-column-start: 1;
+  grid-column-end: -1;
+}
+body .flex .left .leftBottom .timeFlex {
+  display: flex;
+  justify-content: space-between;
+}
+body .flex .left .leftBottom .toRight {
+  margin-left: auto;
+}
+body .flex .left .leftBottom .toRight, body .flex .left .leftBottom .time {
+  color: rgb(10, 221, 221);
+}
+body .flex .right {
+  right: 20px;
+}
+body .flex .right .rightTop {
+  background-color: rgba(58, 69, 218, 0.5333333333);
+  text-align: center;
+  padding: 3px;
+}
+body .flex .right .rightTop .planetName {
+  font-size: 1.1em;
+  width: -moz-fit-content;
+  width: fit-content;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  margin: 0 auto;
+  color: #ffffff;
+}
+body .flex .right .rightTop .planetName img {
+  width: 18px;
+  margin-left: 7px;
+}
+body .flex .right .rightBottom {
+  margin: 10px 0 0 20px;
+  height: 75%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+body .flex .middle {
+  overflow: hidden;
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  height: 100vh;
+}
+body .flex .middle .arrowDown, body .flex .middle .arrowUp {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  width: -moz-fit-content;
+  width: fit-content;
+  transition-property: all;
+  transition-timing-function: ease-out;
+  transition-duration: 0.7s;
+}
+body .flex .middle .arrowDown:hover .arrowShadow, body .flex .middle .arrowUp:hover .arrowShadow {
+  display: block;
+}
+body .flex .middle .arrowDown .arrowShadow, body .flex .middle .arrowUp .arrowShadow {
+  display: none;
+}
+body .flex .middle .arrowDown .arrowDownMssg, body .flex .middle .arrowUp .arrowDownMssg {
+  position: absolute;
+  bottom: -17px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 300px;
+  text-align: center;
+  color: white;
+}
+body .flex .middle .arrowUp {
+  z-index: 1;
+  opacity: 0;
+}
+body .flex .middle .scrollBar {
+  position: absolute;
+  width: -moz-fit-content;
+  width: fit-content;
+  top: 80%;
+  left: 50%;
+  transform: translateX(-50%);
+  height: -moz-fit-content;
+  height: fit-content;
+  opacity: 0;
+  transition: opacity ease-out 0.7s;
+  z-index: 1;
+}
+body .flex .middle .scrollBar .scale {
+  position: relative;
+  width: 160px;
+  height: 40px;
+  border: 1px white solid;
+  border-bottom: none;
+  border-top: none;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+body .flex .middle .scrollBar .scale .svgArrowLeft, body .flex .middle .scrollBar .scale .svgArrowRight {
+  position: absolute;
+  bottom: 0;
+}
+body .flex .middle .scrollBar .scale .svgArrowLeft {
+  left: 0;
+}
+body .flex .middle .scrollBar .scale .svgArrowRight {
+  right: 0;
+}
+body .flex .middle .scrollBar .scale .innerScale {
+  color: white;
+  border-bottom: 1px white solid;
+  text-align: center;
+  width: 100%;
+  position: absolute;
+  left: 0;
+  bottom: 5px;
+}
+body .flex .middle .planetList {
+  height: 400px;
+  width: -moz-fit-content;
+  width: fit-content;
+  position: absolute;
+  top: -200px;
+  transform: translateY(-50%);
+  opacity: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: flex-end;
+  transition: opacity ease-out 0.7s, top ease-out 0.7s;
+}
+body .flex .middle .planetList .planetLi {
+  width: 300px;
+  width: 230px;
+  box-sizing: border-box;
+  position: relative;
+  border-radius: 15px;
+}
+body .flex .middle .planetList .planetLi .planetContainerLi {
+  position: absolute;
+  bottom: 0;
+  display: none;
+  left: 0;
+  width: 100%;
+  z-index: 0;
+}
+body .flex .middle .planetList .planetLi .planetLiTop {
+  width: -moz-fit-content;
+  width: fit-content;
+  margin: 10px auto;
+  color: white;
+}
+body .flex .middle .planetList .planetLi .planetLiTop .pName {
+  width: -moz-fit-content;
+  width: fit-content;
+  padding: 3px 20px;
+  margin: 0 auto 5px;
+  font-size: 1.2em;
+  background-color: rgba(99, 107, 216, 0.5803921569);
+  display: flex;
+}
+body .flex .middle .planetList .planetLi .planetLiTop .pName img {
+  width: 18px;
+  margin-left: 7px;
+}
+body .flex .middle .planetList .planetLi .planetLiTop .grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+}
+body .flex .middle .planetList .planetLi .planetLiTop .grid .gridLeft {
+  width: -moz-fit-content;
+  width: fit-content;
+  margin: 0 auto;
+}
+body .flex .middle .planetList .planetLi img {
+  display: block;
+  margin: 0 auto;
+  width: 84%;
+}
+body .flex .middle .planetList .planetLi .forBoxShadow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 15px;
+  z-index: 1;
+}
+body .flex .middle .planetList li.Saturn .planetImg {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 3px;
+  z-index: -1;
+}
+body #satellite {
+  width: -moz-fit-content;
+  width: fit-content;
+  height: 21px;
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: -1;
+  color: white;
+  transition-property: opacity, top;
+  transition-timing-function: ease-out;
+  transition-duration: 0.7s;
+}
+body #satellite .satelliteImg {
+  width: 100%;
+}
+body #satellite .launchDirectionImg {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  left: 30px;
+  width: 30px;
+}
+body #satellite .showInitParams {
+  width: 300px;
+  position: absolute;
+  top: -40px;
+  left: -70px;
+}
+body .scale_testing_purpose_only {
+  width: 200px;
+  height: 200px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-sizing: border-box;
+  z-index: -1;
+}
+body .planetContainer {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 200px;
+  height: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: -2;
+  transition-property: opacity;
+  transition-timing-function: ease-out;
+  transition-duration: 0.7s;
+}
+body .planetContainer img {
+  width: 120%;
+}
+@keyframes shine {
+  0% {
+    background-color: rgb(255, 255, 255);
+  }
+  50% {
+    background-color: rgb(34, 34, 34);
+  }
+  100% {
+    background-color: rgb(255, 255, 255);
+  }
+}
+body .star {
+  position: absolute;
+  animation-name: shine;
+  animation-iteration-count: infinite;
+  z-index: -2;
+}
+body .star1 {
+  width: 1px;
+  height: 1px;
+  background-color: white;
+}
+body .star2 {
+  width: 1px;
+  height: 1px;
+  background-color: white;
+}
+body .star3 {
+  width: 1px;
+  height: 1px;
+  background-color: rgb(53, 53, 53);
+}
+body .star4 {
+  width: 1px;
+  height: 1px;
+  background-color: rgb(109, 103, 158);
+}
+body .star5 {
+  width: 3px;
+  height: 3px;
+  background-color: rgb(255, 255, 255);
+}
+
+.scrollBar input[type=range] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+       appearance: none;
+  width: 400px;
+}
+
+.scrollBar input[type=range]:focus {
+  outline: none;
+}
+
+/*------------Track------------*/
+.scrollBar input[type=range]::-webkit-slider-runnable-track {
+  width: 500px;
+  height: 5px;
+  cursor: pointer;
+  box-shadow: 0 0 7px #ffffff;
+  background: #ffffff;
+}
+
+.scrollBar input[type=range]::-moz-range-track {
+  width: 500px;
+  height: 5px;
+  cursor: pointer;
+  box-shadow: 0 0 7px #ffffff;
+  background: #ffffff;
+}
+
+.scrollBar input[type=range]::-ms-track {
+  width: 500px;
+  height: 5px;
+  cursor: pointer;
+  background: transparent;
+  border-color: transparent;
+  color: transparent;
+}
+
+/*------------Thumb------------*/
+.scrollBar input[type=range]::-webkit-slider-thumb {
+  height: 9px;
+  width: 25px;
+  background: #636bd8;
+  cursor: pointer;
+  -webkit-appearance: none;
+  margin-top: -2px;
+}
+
+.scrollBar input[type=range]::-moz-range-thumb {
+  height: 9px;
+  width: 25px;
+  background: #636bd8;
+  cursor: pointer;
+}
+
+.scrollBar input[type=range]::-ms-thumb {
+  height: 9px;
+  width: 25px;
+  background: #636bd8;
+  cursor: pointer;
+}
+
+.scrollBar input[type=range]::-ms-fill-lower {
+  background: #74A9D8;
+  border: 0px solid #010101;
+  border-radius: 2px;
+  box-shadow: 1px 1px 1px #000000;
+}
+
+.scrollBar input[type=range]::-ms-fill-upper {
+  background: #74A9D8;
+  border: 0px solid #010101;
+  border-radius: 2px;
+  box-shadow: 1px 1px 1px #000000;
+}/*# sourceMappingURL=style.css.map */

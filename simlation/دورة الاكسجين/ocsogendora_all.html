@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>دورة الأكسجين في الغلاف الجوي</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(to bottom, #87CEEB, #E0F7FA);
+            margin: 0;
+            padding: 20px;
+            color: #333;
+            text-align: center;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        h1 {
+            color: #1E88E5;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px;
+        }
+        
+        .simulation-container {
+            position: relative;
+            width: 100%;
+            height: 600px;
+            margin: 20px auto;
+            background-color: #E0F7FA;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 2px solid #B2EBF2;
+        }
+        
+        #oxygen-cycle {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: rgba(30, 136, 229, 0.1);
+            border-radius: 10px;
+        }
+        
+        button {
+            background: linear-gradient(to bottom, #4CAF50, #388E3C);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 5px;
+            min-width: 150px;
+            font-size: 16px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+        
+        .explanation {
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: right;
+            border-right: 4px solid #1E88E5;
+        }
+        
+        .step {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: rgba(176, 224, 230, 0.3);
+            border-radius: 8px;
+            border-right: 3px solid #1E88E5;
+            position: relative;
+        }
+        
+        .step h4 {
+            color: #0D47A1;
+            margin-top: 0;
+        }
+        
+        .molecule {
+            animation: float 6s infinite ease-in-out;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .arrow {
+            animation: flow 8s infinite linear;
+        }
+        
+        @keyframes flow {
+            0% { stroke-dashoffset: 100; }
+            100% { stroke-dashoffset: 0; }
+        }
+        
+        .data-panel {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+        
+        .data-card {
+            background-color: rgba(30, 136, 229, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px;
+            min-width: 200px;
+            border-right: 3px solid #1E88E5;
+        }
+        
+        .data-label {
+            color: #0D47A1;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .highlight {
+            color: #E91E63;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌍 دورة الأكسجين في الغلاف الجوي 🌿</h1>
+        
+        <div class="simulation-container">
+            <svg id="oxygen-cycle" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+                <!-- خلفية السماء -->
+                <rect width="100%" height="100%" fill="url(#sky-gradient)"/>
+                
+                <!-- الأرض -->
+                <path d="M0,450 Q200,400 400,450 Q600,500 800,450 L800,600 L0,600 Z" fill="#8BC34A"/>
+                
+                <!-- النباتات -->
+                <path d="M100,450 Q120,350 140,450" stroke="#4CAF50" stroke-width="3" fill="none"/>
+                <path d="M200,450 Q220,300 240,450" stroke="#4CAF50" stroke-width="4" fill="none"/>
+                <path d="M300,450 Q320,380 340,450" stroke="#4CAF50" stroke-width="3" fill="none"/>
+                <path d="M500,450 Q520,320 540,450" stroke="#4CAF50" stroke-width="5" fill="none"/>
+                <path d="M700,450 Q720,350 740,450" stroke="#4CAF50" stroke-width="3" fill="none"/>
+                
+                <!-- الشمس -->
+                <circle cx="700" cy="100" r="50" fill="url(#sun-gradient)" filter="url(#sun-glow)"/>
+                
+                <!-- الحيوانات -->
+                <path id="animal1" d="M150,500 Q170,480 190,500 Q200,520 180,520 Q160,520 150,500" fill="#795548"/>
+                <circle cx="160" cy="490" r="5" fill="#000"/>
+                
+                <path id="animal2" d="M600,500 Q620,480 640,500 Q650,520 630,520 Q610,520 600,500" fill="#FF9800"/>
+                <circle cx="610" cy="490" r="5" fill="#000"/>
+                
+                <!-- جزيئات الأكسجين -->
+                <g class="molecule" id="o2-plant1">
+                    <circle cx="120" cy="380" r="10" fill="#FF5722" opacity="0"/>
+                    <circle cx="130" cy="380" r="10" fill="#FF5722" opacity="0"/>
+                    <line x1="120" y1="380" x2="130" y2="380" stroke="#FF5722" stroke-width="2" opacity="0"/>
+                </g>
+                
+                <g class="molecule" id="o2-plant2">
+                    <circle cx="220" cy="330" r="10" fill="#FF5722" opacity="0"/>
+                    <circle cx="230" cy="330" r="10" fill="#FF5722" opacity="0"/>
+                    <line x1="220" y1="330" x2="230" y2="330" stroke="#FF5722" stroke-width="2" opacity="0"/>
+                </g>
+                
+                <g class="molecule" id="o2-plant3">
+                    <circle cx="520" cy="350" r="10" fill="#FF5722" opacity="0"/>
+                    <circle cx="530" cy="350" r="10" fill="#FF5722" opacity="0"/>
+                    <line x1="520" y1="350" x2="530" y2="350" stroke="#FF5722" stroke-width="2" opacity="0"/>
+                </g>
+                
+                <!-- جزيئات ثاني أكسيد الكربون -->
+                <g class="molecule" id="co2-animal1">
+                    <circle cx="170" cy="490" r="8" fill="#607D8B" opacity="0"/>
+                    <circle cx="185" cy="490" r="8" fill="#607D8B" opacity="0"/>
+                    <circle cx="200" cy="490" r="8" fill="#607D8B" opacity="0"/>
+                    <line x1="170" y1="490" x2="185" y2="490" stroke="#607D8B" stroke-width="2" opacity="0"/>
+                    <line x1="185" y1="490" x2="200" y2="490" stroke="#607D8B" stroke-width="2" opacity="0"/>
+                </g>
+                
+                <g class="molecule" id="co2-animal2">
+                    <circle cx="620" cy="490" r="8" fill="#607D8B" opacity="0"/>
+                    <circle cx="635" cy="490" r="8" fill="#607D8B" opacity="0"/>
+                    <circle cx="650" cy="490" r="8" fill="#607D8B" opacity="0"/>
+                    <line x1="620" y1="490" x2="635" y2="490" stroke="#607D8B" stroke-width="2" opacity="0"/>
+                    <line x1="635" y1="490" x2="650" y2="490" stroke="#607D8B" stroke-width="2" opacity="0"/>
+                </g>
+                
+                <!-- مسارات الدورة -->
+                <path id="photosynthesis-path" d="M700,100 Q550,200 400,300 Q300,350 200,350" fill="none" stroke="#4CAF50" stroke-width="2" stroke-dasharray="10,5" opacity="0.5"/>
+                <path id="respiration-path" d="M200,500 Q300,450 400,400 Q500,350 600,300 Q700,250 700,100" fill="none" stroke="#FF5722" stroke-width="2" stroke-dasharray="10,5" opacity="0.5"/>
+                
+                <!-- أسهم التدفق -->
+                <path class="arrow" id="photosynthesis-arrow" d="M400,300 L390,290 M400,300 L390,310" stroke="#4CAF50" stroke-width="3" opacity="0"/>
+                <path class="arrow" id="respiration-arrow" d="M400,400 L410,390 M400,400 L410,410" stroke="#FF5722" stroke-width="3" opacity="0"/>
+                
+                <!-- التدرجات والمرشحات -->
+                <defs>
+                    <linearGradient id="sky-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" stop-color="#87CEEB"/>
+                        <stop offset="100%" stop-color="#E0F7FA"/>
+                    </linearGradient>
+                    
+                    <radialGradient id="sun-gradient" cx="30%" cy="30%" r="70%">
+                        <stop offset="0%" stop-color="#FFD700"/>
+                        <stop offset="50%" stop-color="#FF8C00"/>
+                        <stop offset="100%" stop-color="#FF4500"/>
+                    </radialGradient>
+                    
+                    <filter id="sun-glow" x="-30%" y="-30%" width="160%" height="160%">
+                        <feGaussianBlur stdDeviation="5" result="blur"/>
+                        <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+                    </filter>
+                    
+                    <pattern id="leaf-pattern" patternUnits="userSpaceOnUse" width="20" height="20">
+                        <path d="M10,0 Q15,5 10,10 Q5,5 10,0" fill="#4CAF50"/>
+                    </pattern>
+                </defs>
+                
+                <!-- النصوص التوضيحية -->
+                <text x="700" y="170" fill="#FF8C00" font-size="14" text-anchor="middle">الشمس</text>
+                <text x="200" cy="330" fill="#4CAF50" font-size="14" text-anchor="middle">النباتات</text>
+                <text x="600" cy="490" fill="#795548" font-size="14" text-anchor="middle">الكائنات الحية</text>
+                <text x="400" y="280" fill="#4CAF50" font-size="14" text-anchor="middle" opacity="0" id="photosynthesis-label">البناء الضوئي</text>
+                <text x="400" y="420" fill="#FF5722" font-size="14" text-anchor="middle" opacity="0" id="respiration-label">التنفس الخلوي</text>
+            </svg>
+        </div>
+        
+        <div class="controls">
+            <button id="start-btn">▶️ بدء المحاكاة</button>
+            <button id="pause-btn">⏸ إيقاف مؤقت</button>
+            <button id="reset-btn">🔄 إعادة الضبط</button>
+            <button id="explain-btn">❓ شرح العملية</button>
+        </div>
+        
+        <div class="data-panel">
+            <div class="data-card">
+                <div class="data-label">إنتاج الأكسجين</div>
+                <div id="oxygen-production">0 جزيء/ثانية</div>
+                <div>بواسطة <span class="highlight">النباتات</span></div>
+            </div>
+            <div class="data-card">
+                <div class="data-label">استهلاك الأكسجين</div>
+                <div id="oxygen-consumption">0 جزيء/ثانية</div>
+                <div>بواسطة <span class="highlight">الكائنات الحية</span></div>
+            </div>
+            <div class="data-card">
+                <div class="data-label">إنتاج ثاني أكسيد الكربون</div>
+                <div id="co2-production">0 جزيء/ثانية</div>
+                <div>بواسطة <span class="highlight">التنفس</span></div>
+            </div>
+        </div>
+        
+        <div class="explanation">
+            <h3>🔬 شرح دورة الأكسجين في الطبيعة</h3>
+            
+            <div class="step">
+                <h4>1. عملية البناء الضوئي (في النباتات)</h4>
+                <p>تستخدم النباتات الطاقة الشمسية لتحويل ثاني أكسيد الكربون والماء إلى جلوكوز وأكسجين:</p>
+                <p style="color:#4CAF50; font-weight:bold">6CO₂ + 6H₂O + ضوء الشمس → C₆H₁₂O₆ + 6O₂</p>
+                <p>هذه العملية هي المصدر الرئيسي للأكسجين في الغلاف الجوي.</p>
+            </div>
+            
+            <div class="step">
+                <h4>2. عملية التنفس الخلوي (في الكائنات الحية)</h4>
+                <p>تستخدم الكائنات الحية الأكسجين لتفكيك الجلوكوز وإنتاج الطاقة:</p>
+                <p style="color:#FF5722; font-weight:bold">C₆H₁₂O₆ + 6O₂ → 6CO₂ + 6H₂O + طاقة</p>
+                <p>هذه العملية تستهلك الأكسجين وتطلق ثاني أكسيد الكربون.</p>
+            </div>
+            
+            <div class="step">
+                <h4>3. التوازن في الطبيعة</h4>
+                <p>تعمل هاتان العمليتان معًا للحفاظ على توازن الأكسجين وثاني أكسيد الكربون في الغلاف الجوي:</p>
+                <ul>
+                    <li>النباتات تنتج الأكسجين وتستهلك ثاني أكسيد الكربون</li>
+                    <li>الكائنات الحية تستهلك الأكسجين وتنتج ثاني أكسيد الكربون</li>
+                    <li>هذه الدورة المستمرة تحافظ على الحياة على الأرض</li>
+                </ul>
+            </div>
+            
+            <div class="step">
+                <h4>4. أهمية الغابات والمحيطات</h4>
+                <p>تساهم الغابات والعوالق النباتية في المحيطات بأكثر من 70% من إنتاج الأكسجين العالمي، بينما تستهلك الكائنات الحية الأكسجين للتنفس.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // العناصر SVG
+            const o2Plants = [
+                document.getElementById('o2-plant1'),
+                document.getElementById('o2-plant2'),
+                document.getElementById('o2-plant3')
+            ];
+            
+            const co2Animals = [
+                document.getElementById('co2-animal1'),
+                document.getElementById('co2-animal2')
+            ];
+            
+            const photosynthesisArrow = document.getElementById('photosynthesis-arrow');
+            const respirationArrow = document.getElementById('respiration-arrow');
+            const photosynthesisLabel = document.getElementById('photosynthesis-label');
+            const respirationLabel = document.getElementById('respiration-label');
+            
+            // عناصر التحكم
+            const startBtn = document.getElementById('start-btn');
+            const pauseBtn = document.getElementById('pause-btn');
+            const resetBtn = document.getElementById('reset-btn');
+            const explainBtn = document.getElementById('explain-btn');
+            
+            // عناصر البيانات
+            const oxygenProduction = document.getElementById('oxygen-production');
+            const oxygenConsumption = document.getElementById('oxygen-consumption');
+            const co2Production = document.getElementById('co2-production');
+            
+            // حالة المحاكاة
+            let isPlaying = false;
+            let animationInterval;
+            let molecules = [];
+            let productionCount = 0;
+            let consumptionCount = 0;
+            let co2Count = 0;
+            
+            // بدء المحاكاة
+            function startSimulation() {
+                if (isPlaying) return;
+                
+                isPlaying = true;
+                startBtn.disabled = true;
+                pauseBtn.disabled = false;
+                
+                // إظهار الأسهم والتسميات
+                photosynthesisArrow.setAttribute('opacity', '1');
+                respirationArrow.setAttribute('opacity', '1');
+                photosynthesisLabel.setAttribute('opacity', '1');
+                respirationLabel.setAttribute('opacity', '1');
+                
+                // بدء إنتاج الجزيئات
+                animationInterval = setInterval(() => {
+                    // إنتاج الأكسجين من النباتات
+                    if (Math.random() > 0.7) {
+                        const plant = o2Plants[Math.floor(Math.random() * o2Plants.length)];
+                        showMolecule(plant, 'O2');
+                        productionCount++;
+                        oxygenProduction.textContent = productionCount + ' جزيء/ثانية';
+                    }
+                    
+                    // إنتاج ثاني أكسيد الكربون من الحيوانات
+                    if (Math.random() > 0.5) {
+                        const animal = co2Animals[Math.floor(Math.random() * co2Animals.length)];
+                        showMolecule(animal, 'CO2');
+                        co2Count++;
+                        co2Production.textContent = co2Count + ' جزيء/ثانية';
+                        
+                        // بعد فترة، يستهلك الأكسجين
+                        setTimeout(() => {
+                            consumptionCount++;
+                            oxygenConsumption.textContent = consumptionCount + ' جزيء/ثانية';
+                        }, 1500);
+                    }
+                }, 1000);
+            }
+            
+            // إظهار جزيء
+            function showMolecule(element, type) {
+                const circles = element.querySelectorAll('circle');
+                const lines = element.querySelectorAll('line');
+                
+                // إظهار الجزيء
+                circles.forEach(circle => {
+                    circle.setAttribute('opacity', '1');
+                });
+                
+                lines.forEach(line => {
+                    line.setAttribute('opacity', '1');
+                });
+                
+                // إخفاء الجزيء بعد فترة
+                setTimeout(() => {
+                    circles.forEach(circle => {
+                        circle.setAttribute('opacity', '0');
+                    });
+                    
+                    lines.forEach(line => {
+                        line.setAttribute('opacity', '0');
+                    });
+                }, 3000);
+                
+                // تحريك الجزيء حسب النوع
+                if (type === 'O2') {
+                    animateMolecule(element, 700, 100, 1.5); // نحو الشمس
+                } else {
+                    animateMolecule(element, 200, 500, 1.5); // نحو الحيوانات
+                }
+            }
+            
+            // تحريك الجزيء
+            function animateMolecule(element, targetX, targetY, duration) {
+                const startX = parseFloat(element.getAttribute('cx') || element.querySelector('circle').getAttribute('cx'));
+                const startY = parseFloat(element.getAttribute('cy') || element.querySelector('circle').getAttribute('cy'));
+                
+                const dx = targetX - startX;
+                const dy = targetY - startY;
+                
+                const startTime = performance.now();
+                
+                function move(currentTime) {
+                    const elapsed = (currentTime - startTime) / 1000;
+                    const progress = Math.min(elapsed / duration, 1);
+                    
+                    const newX = startX + dx * progress;
+                    const newY = startY + dy * progress;
+                    
+                    if (element.tagName === 'g') {
+                        const circles = element.querySelectorAll('circle');
+                        const lines = element.querySelectorAll('line');
+                        
+                        circles.forEach((circle, index) => {
+                            circle.setAttribute('cx', newX + (index * 15));
+                            circle.setAttribute('cy', newY);
+                        });
+                        
+                        lines.forEach((line, index) => {
+                            line.setAttribute('x1', newX + (index * 15));
+                            line.setAttribute('y1', newY);
+                            line.setAttribute('x2', newX + ((index + 1) * 15));
+                            line.setAttribute('y2', newY);
+                        });
+                    }
+                    
+                    if (progress < 1) {
+                        requestAnimationFrame(move);
+                    }
+                }
+                
+                requestAnimationFrame(move);
+            }
+            
+            // إيقاف المحاكاة مؤقتًا
+            function pauseSimulation() {
+                isPlaying = false;
+                startBtn.disabled = false;
+                pauseBtn.disabled = true;
+                clearInterval(animationInterval);
+            }
+            
+            // إعادة ضبط المحاكاة
+            function resetSimulation() {
+                pauseSimulation();
+                
+                // إخفاء جميع الجزيئات
+                document.querySelectorAll('.molecule circle, .molecule line').forEach(el => {
+                    el.setAttribute('opacity', '0');
+                });
+                
+                // إخفاء الأسهم والتسميات
+                photosynthesisArrow.setAttribute('opacity', '0');
+                respirationArrow.setAttribute('opacity', '0');
+                photosynthesisLabel.setAttribute('opacity', '0');
+                respirationLabel.setAttribute('opacity', '0');
+                
+                // إعادة تعيين العدادات
+                productionCount = 0;
+                consumptionCount = 0;
+                co2Count = 0;
+                oxygenProduction.textContent = '0 جزيء/ثانية';
+                oxygenConsumption.textContent = '0 جزيء/ثانية';
+                co2Production.textContent = '0 جزيء/ثانية';
+            }
+            
+            // شرح العملية
+            function explainProcess() {
+                const steps = document.querySelectorAll('.step');
+                let delay = 0;
+                
+                steps.forEach(step => {
+                    step.style.opacity = '0';
+                    step.style.maxHeight = '0';
+                    step.style.marginBottom = '0';
+                    step.style.transition = 'none';
+                });
+                
+                steps.forEach((step, index) => {
+                    setTimeout(() => {
+                        step.style.transition = 'all 0.5s ease';
+                        step.style.opacity = '1';
+                        step.style.maxHeight = '200px';
+                        step.style.marginBottom = '20px';
+                    }, delay);
+                    
+                    delay += 800;
+                });
+            }
+            
+            // استماع لأحداث التحكم
+            startBtn.addEventListener('click', startSimulation);
+            pauseBtn.addEventListener('click', pauseSimulation);
+            resetBtn.addEventListener('click', resetSimulation);
+            explainBtn.addEventListener('click', explainProcess);
+            
+            // التهيئة الأولية
+            pauseBtn.disabled = true;
+            explainProcess(); // عرض الشرح تلقائيًا
+        });
+    </script>
+</body>
+</html>

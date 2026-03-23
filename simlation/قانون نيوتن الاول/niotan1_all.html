@@ -1,0 +1,1440 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المحاكاة المتقدمة لقانون نيوتن الأول</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --accent-color: #e74c3c;
+            --dark-color: #111;
+            --light-color: #ecf0f1;
+            --text-color: #fff;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+        
+        body {
+            font-family: 'Tajawal', Arial, sans-serif;
+            background: linear-gradient(135deg, #222 0%, #444 100%);
+            margin: 0;
+            padding: 0;
+            color: var(--text-color);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--dark-color) 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            border: 1px solid #444;
+        }
+        
+        h1 {
+            margin: 0;
+            font-size: 2.2rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        h2 {
+            margin: 10px 0 0;
+            font-size: 1.5rem;
+            color: var(--light-color);
+        }
+        
+        .simulation-container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .simulation-area {
+            flex: 3;
+            min-width: 300px;
+            background-color: var(--dark-color);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            position: relative;
+            border: 1px solid #444;
+        }
+        
+        #simulation {
+            width: 100%;
+            height: 500px;
+            background-color: var(--dark-color);
+        }
+        
+        .controls-panel {
+            flex: 1;
+            min-width: 250px;
+            background-color: #222;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #444;
+        }
+        
+        .control-group {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #444;
+        }
+        
+        .control-group:last-child {
+            border-bottom: none;
+        }
+        
+        .control-group h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+        }
+        
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+            margin: 5px;
+            box-shadow: var(--shadow);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.4);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary-color);
+        }
+        
+        .btn-accent {
+            background-color: var(--accent-color);
+        }
+        
+        .slider-container {
+            margin: 15px 0;
+        }
+        
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            color: #ddd;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            background: #444;
+            height: 8px;
+            border-radius: 4px;
+        }
+        
+        .object-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        
+        .object-option {
+            flex: 1;
+            min-width: 70px;
+            text-align: center;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid #444;
+            background-color: #333;
+        }
+        
+        .object-option:hover, .object-option.selected {
+            border-color: var(--primary-color);
+            background-color: rgba(52, 152, 219, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .object-option img {
+            width: 40px;
+            height: 40px;
+            display: block;
+            margin: 0 auto 5px;
+            filter: drop-shadow(0 0 5px rgba(255,255,255,0.2));
+        }
+        
+        .info-panel {
+            background-color: #222;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            padding: 20px;
+            margin-top: 20px;
+            border: 1px solid #444;
+        }
+        
+        .tab-container {
+            display: flex;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #333;
+            border-radius: 5px 5px 0 0;
+            margin-right: 5px;
+            transition: all 0.3s;
+            border: 1px solid #444;
+            border-bottom: none;
+        }
+        
+        .tab.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 15px;
+            background-color: #333;
+            border-radius: 0 5px 5px 5px;
+            border: 1px solid #444;
+            border-top: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .data-display {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 15px 0;
+            background-color: #333;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #444;
+        }
+        
+        .data-item {
+            flex: 1;
+            min-width: 120px;
+            background-color: #444;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            border: 1px solid #555;
+        }
+        
+        .data-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .data-label {
+            font-size: 0.9rem;
+            color: #bbb;
+        }
+        
+        .vector-display {
+            margin: 15px 0;
+            padding: 10px;
+            background-color: #444;
+            border-radius: 5px;
+            border: 1px solid #555;
+        }
+        
+        .real-time-display {
+            position: absolute;
+            bottom: 10px;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            background-color: rgba(0,0,0,0.7);
+            padding: 10px;
+            border-radius: 5px;
+        }
+        
+        .rt-data-item {
+            text-align: center;
+            padding: 5px 15px;
+            background-color: rgba(52, 152, 219, 0.3);
+            border-radius: 5px;
+            min-width: 100px;
+            border: 1px solid var(--primary-color);
+        }
+        
+        .rt-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #fff;
+        }
+        
+        .rt-label {
+            font-size: 0.8rem;
+            color: #bbb;
+        }
+        
+        @media (max-width: 768px) {
+            .simulation-container {
+                flex-direction: column;
+            }
+            
+            .simulation-area, .controls-panel {
+                flex: 1;
+            }
+            
+            .real-time-display {
+                position: static;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            
+            .rt-data-item {
+                min-width: 80px;
+                padding: 5px 10px;
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>المحاكاة المتقدمة لقانون نيوتن الأول</h1>
+            <h2>قانون القصور الذاتي - عرض تعليمي متكامل</h2>
+        </header>
+        
+        <div class="simulation-container">
+            <div class="simulation-area">
+                <svg id="simulation" xmlns="http://www.w3.org/2000/svg"></svg>
+                <div class="real-time-display">
+                    <div class="rt-data-item">
+                        <div class="rt-value" id="rt-velocity">0.00</div>
+                        <div class="rt-label">السرعة (م/ث)</div>
+                    </div>
+                    <div class="rt-data-item">
+                        <div class="rt-value" id="rt-position">0.00</div>
+                        <div class="rt-label">المسافة (م)</div>
+                    </div>
+                    <div class="rt-data-item">
+                        <div class="rt-value" id="rt-time">0.00</div>
+                        <div class="rt-label">الزمن (ث)</div>
+                    </div>
+                    <div class="rt-data-item">
+                        <div class="rt-value" id="rt-force">0.00</div>
+                        <div class="rt-label">القوة (نيوتن)</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="controls-panel">
+                <div class="control-group">
+                    <h3>اختر الجسم</h3>
+                    <div class="object-selector">
+                        <div class="object-option" onclick="changeObject('box')" data-object="box">
+                            <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iODAiIGhlaWdodD0iNjAiIHg9IjEwIiB5PSIyMCIgZmlsbD0iIzM0OThkYiIgc3Ryb2tlPSIjMmM3ZTVmIiBzdHJva2Utd2lkdGg9IjIiLz48L3N2Zz4=" alt="صندوق">
+                            صندوق
+                        </div>
+                        <div class="object-option" onclick="changeObject('ball')" data-object="ball">
+                            <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48Y2lyY2xlIGN4PSI1MCIgY3k9IjUwIiByPSI0MCIgZmlsbD0iI2U3NGMzYyIgc3Ryb2tlPSIjYzAzODJhIiBzdHJva2Utd2lkdGg9IjIiLz48L3N2Zz4=" alt="كرة">
+                            كرة
+                        </div>
+                        <div class="object-option selected" onclick="changeObject('car')" data-object="car">
+                            <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iNzAiIGhlaWdodD0iMzAiIHg9IjE1IiB5PSI0MCIgZmlsbD0iIzJlY2M1NCIgc3Ryb2tlPSIjMjdhZTU4IiBzdHJva2Utd2lkdGg9IjIiLz48cmVjdCB3aWR0aD0iODAiIGhlaWdodD0iMjAiIHg9IjEwIiB5PSIzNSIgZmlsbD0iIzM0OThEZiIgc3Ryb2tlPSIjMkM3RTVGIiBzdHJva2Utd2lkdGg9IjIiIHJ4PSI1Ii8+PGNpcmNsZSBjeD0iMjUiIGN5PSI3MCIgcj0iMTUiIGZpbGw9IiMzNDM0MzQiIHN0cm9rZT0iIzJjM2U1MCIgc3Ryb2tlLXdpZHRoPSIyIi8+PGNpcmNsZSBjeD0iNzUiIGN5PSI3MCIgcj0iMTUiIGZpbGw9IiMzNDM0MzQiIHN0cm9rZT0iIzJjM2U1MCIgc3Ryb2tlLXdpZHRoPSIyIi8+PC9zdmc+" alt="سيارة">
+                            سيارة
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <h3>التحكم في القوى</h3>
+                    <button class="btn btn-secondary" onclick="applyForce(1)">→ قوة لليمين</button>
+                    <button class="btn btn-secondary" onclick="applyForce(-1)">← قوة لليسار</button>
+                    <button class="btn" onclick="applyImpulse(1)">دفعة قوية →</button>
+                    <button class="btn" onclick="applyImpulse(-1)">← دفعة قوية</button>
+                </div>
+                
+                <div class="control-group">
+                    <h3>خصائص البيئة</h3>
+                    <div class="slider-container">
+                        <div class="slider-label">
+                            <span>احتكاك: <span id="friction-value">0.05</span></span>
+                        </div>
+                        <input type="range" id="friction-slider" min="0" max="0.2" step="0.01" value="0.05">
+                    </div>
+                    
+                    <div class="slider-container">
+                        <div class="slider-label">
+                            <span>الجاذبية: <span id="gravity-value">0.0</span></span>
+                        </div>
+                        <input type="range" id="gravity-slider" min="0" max="0.5" step="0.05" value="0.0">
+                    </div>
+                    
+                    <div>
+                        <button class="btn" onclick="toggleGrid()">تبديل الشبكة</button>
+                        <button class="btn" onclick="toggleVectors()">تبديل الأسهم</button>
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <h3>التحكم في العرض</h3>
+                    <button class="btn" onclick="resetSimulation()">إعادة الضبط</button>
+                    <button class="btn btn-accent" onclick="showHelp()">مساعدة</button>
+                    <button class="btn" onclick="toggleFullscreen()">ملء الشاشة</button>
+                </div>
+                
+                <div class="data-display">
+                    <div class="data-item">
+                        <div class="data-value" id="velocity-value">0.00</div>
+                        <div class="data-label">السرعة (م/ث)</div>
+                    </div>
+                    <div class="data-item">
+                        <div class="data-value" id="position-value">0.00</div>
+                        <div class="data-label">المسافة (م)</div>
+                    </div>
+                    <div class="data-item">
+                        <div class="data-value" id="time-value">0.00</div>
+                        <div class="data-label">الزمن (ث)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="info-panel">
+            <div class="tab-container">
+                <div class="tab active" onclick="switchTab('explanation')">شرح القانون</div>
+                <div class="tab" onclick="switchTab('vectors')">تحليل القوى</div>
+                <div class="tab" onclick="switchTab('applications')">تطبيقات عملية</div>
+                <div class="tab" onclick="switchTab('experiments')">تجارب مقترحة</div>
+            </div>
+            
+            <div id="explanation" class="tab-content active">
+                <h3>قانون نيوتن الأول (قانون القصور الذاتي)</h3>
+                <p>ينص القانون على أن: <strong>"الجسم الساكن يبقى ساكنًا، والجسم المتحرك بسرعة ثابتة في خط مستقيم يبقى متحركًا بنفس السرعة والاتجاه ما لم تؤثر عليه قوة خارجية"</strong>.</p>
+                
+                <div class="vector-display">
+                    <h4>في هذه المحاكاة:</h4>
+                    <ol>
+                        <li>الجسم يبدأ في حالة سكون (سرعة = 0)</li>
+                        <li>عند تطبيق قوة، يتغير مقدار السرعة حسب شدة القوة</li>
+                        <li>في غياب القوة (أو عندما تكون محصلة القوى صفرًا)، يبقى الجسم على حالته</li>
+                        <li>قوة الاحتكاك تعمل على إبطاء الجسم حتى يتوقف</li>
+                    </ol>
+                </div>
+                
+                <p>هذا القانون يعبر عن خاصية أساسية للمادة تسمى <strong>القصور الذاتي</strong>، وهي مقاومة الجسم لأي تغيير في حالته الحركية.</p>
+            </div>
+            
+            <div id="vectors" class="tab-content">
+                <h3>تحليل القوى المؤثرة على الجسم</h3>
+                <svg id="vector-diagram" width="100%" height="200" xmlns="http://www.w3.org/2000/svg"></svg>
+                
+                <div class="data-display">
+                    <div class="data-item">
+                        <div class="data-value" id="applied-force-value">0.00</div>
+                        <div class="data-label">القوة المطبقة (نيوتن)</div>
+                    </div>
+                    <div class="data-item">
+                        <div class="data-value" id="friction-force-value">0.00</div>
+                        <div class="data-label">قوة الاحتكاك (نيوتن)</div>
+                    </div>
+                    <div class="data-item">
+                        <div class="data-value" id="net-force-value">0.00</div>
+                        <div class="data-label">محصلة القوى (نيوتن)</div>
+                    </div>
+                </div>
+                
+                <p>عندما تكون <strong>محصلة القوى صفرًا</strong>، لا يتغير حال الجسم الحركي (وهذا ما يعبر عنه قانون نيوتن الأول).</p>
+            </div>
+            
+            <div id="applications" class="tab-content">
+                <h3>تطبيقات قانون نيوتن الأول في الحياة اليومية</h3>
+                
+                <div style="display: flex; flex-wrap: wrap; gap: 15px;">
+                    <div style="flex: 1; min-width: 250px; background: rgba(52, 152, 219, 0.1); padding: 15px; border-radius: 5px; border: 1px solid #3498db;">
+                        <h4>أحزمة الأمان في السيارات</h4>
+                        <p>عند التوقف المفاجئ، يستمر الركاب في الحركة للأمام بسبب القصور الذاتي. أحزمة الأمان تمنع الاصطدام.</p>
+                    </div>
+                    
+                    <div style="flex: 1; min-width: 250px; background: rgba(46, 204, 113, 0.1); padding: 15px; border-radius: 5px; border: 1px solid #2ecc71;">
+                        <h4>إزالة الغبار من السجاد</h4>
+                        <p>عند ضرب السجادة، تتحرك بينما يبقى الغبار في مكانه بسبب القصور الذاتي، فينفصل عنها.</p>
+                    </div>
+                    
+                    <div style="flex: 1; min-width: 250px; background: rgba(231, 76, 60, 0.1); padding: 15px; border-radius: 5px; border: 1px solid #e74c3c;">
+                        <h4>حركة الأجسام في الفضاء</h4>
+                        <p>في الفضاء حيث لا يوجد احتكاك، تتحرك الأجسام بسرعة ثابتة إلى ما لا نهاية دون حاجة لقوة محركة.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="experiments" class="tab-content">
+                <h3>تجارب مقترحة للطلاب</h3>
+                
+                <ol>
+                    <li><strong>تجربة القصور الذاتي:</strong> ضع عملة معدنية على قطعة من الورق المقوى فوق كأس. اسحب الورق بسرعة، وسقطت العملة في الكأس بسبب القصور الذاتي.</li>
+                    <li><strong>تجربة الاحتكاك:</strong> دحرج كرة على أسطح مختلفة (سجاد، خشب، جليد) ولاحظ الفرق في المسافة التي تقطعها قبل أن تتوقف.</li>
+                    <li><strong>تجربة الجاذبية:</strong> في المحاكاة، شغل الجاذبية وحاول دفع الكرة لترى كيف تختلف حركتها مع وجود قوة الجاذبية.</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // عناصر SVG
+        const svg = document.getElementById('simulation');
+        const vectorDiagram = document.getElementById('vector-diagram');
+        
+        // عناصر التحكم
+        const frictionSlider = document.getElementById('friction-slider');
+        const gravitySlider = document.getElementById('gravity-slider');
+        const frictionValue = document.getElementById('friction-value');
+        const gravityValue = document.getElementById('gravity-value');
+        const velocityValue = document.getElementById('velocity-value');
+        const positionValue = document.getElementById('position-value');
+        const timeValue = document.getElementById('time-value');
+        const appliedForceValue = document.getElementById('applied-force-value');
+        const frictionForceValue = document.getElementById('friction-force-value');
+        const netForceValue = document.getElementById('net-force-value');
+        
+        // عناصر العرض المباشر
+        const rtVelocity = document.getElementById('rt-velocity');
+        const rtPosition = document.getElementById('rt-position');
+        const rtTime = document.getElementById('rt-time');
+        const rtForce = document.getElementById('rt-force');
+        
+        // متغيرات المحاكاة
+        let objectType = 'car'; // السيارة هي الافتراضية الآن
+        let position = 150;
+        let velocity = 0;
+        let acceleration = 0;
+        let friction = 0.05;
+        let gravity = 0;
+        let time = 0;
+        let appliedForce = 0;
+        let isOnGround = true;
+        let showGrid = true;
+        let showVectors = true;
+        let objectWidth = 90; // عرض السيارة
+        let objectHeight = 55; // ارتفاع السيارة
+        let groundLevel = 400;
+        let animationId = null;
+        let lastTime = 0;
+        
+        // عناصر الرسم
+        let objectElement = null;
+        let groundElement = null;
+        let gridGroup = null;
+        let vectorsGroup = null;
+        let pathElement = null;
+        let pathPoints = [];
+        let springElement = null;
+        let infoMarkersGroup = null;
+        let forceIndicators = [];
+        
+        // تهيئة المحاكاة
+        function initSimulation() {
+            // إعداد حجم SVG
+            svg.setAttribute('width', svg.parentElement.clientWidth);
+            svg.setAttribute('height', svg.parentElement.clientHeight);
+            groundLevel = svg.clientHeight - 50;
+            
+            // مسح SVG
+            svg.innerHTML = '';
+            vectorDiagram.innerHTML = '';
+            
+            // رسم الأرضية
+            drawGround();
+            
+            // رسم الشبكة
+            drawGrid();
+            
+            // رسم الجسم
+            drawObject();
+            
+            // رسم نوابض القوة
+            drawSpring();
+            
+            // رسم مسار الحركة
+            drawPath();
+            
+            // رسم أسهم القوى
+            drawVectors();
+            
+            // رسم المؤشرات التوضيحية
+            drawInfoMarkers();
+            
+            // تحديث مخطط القوى
+            updateForceDiagram();
+            
+            // بدء المحاكاة
+            lastTime = performance.now();
+            animationId = requestAnimationFrame(animate);
+            
+            // أحداث المنزلقات
+            frictionSlider.addEventListener('input', updateFriction);
+            gravitySlider.addEventListener('input', updateGravity);
+        }
+        
+        // رسم الأرضية
+        function drawGround() {
+            groundElement = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            groundElement.setAttribute('x', '0');
+            groundElement.setAttribute('y', groundLevel);
+            groundElement.setAttribute('width', '100%');
+            groundElement.setAttribute('height', '50');
+            groundElement.setAttribute('fill', '#333');
+            groundElement.setAttribute('stroke', '#444');
+            groundElement.setAttribute('stroke-width', '2');
+            svg.appendChild(groundElement);
+            
+            // إضافة مقياس للأرضية
+            for (let i = 0; i < svg.clientWidth; i += 100) {
+                const scale = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                scale.setAttribute('x1', i);
+                scale.setAttribute('y1', groundLevel + 5);
+                scale.setAttribute('x2', i);
+                scale.setAttribute('y2', groundLevel + 15);
+                scale.setAttribute('stroke', '#666');
+                scale.setAttribute('stroke-width', '2');
+                svg.appendChild(scale);
+                
+                const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                label.setAttribute('x', i);
+                label.setAttribute('y', groundLevel + 30);
+                label.setAttribute('text-anchor', 'middle');
+                label.setAttribute('fill', '#aaa');
+                label.setAttribute('font-size', '12');
+                label.textContent = i + ' م';
+                svg.appendChild(label);
+            }
+        }
+        
+        // رسم الشبكة
+        function drawGrid() {
+            gridGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            gridGroup.setAttribute('class', 'grid');
+            
+            // خطوط أفقية
+            for (let y = 50; y < groundLevel; y += 50) {
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('class', 'grid-line');
+                line.setAttribute('x1', '0');
+                line.setAttribute('y1', y);
+                line.setAttribute('x2', svg.clientWidth);
+                line.setAttribute('y2', y);
+                line.setAttribute('stroke', 'rgba(255, 255, 255, 0.2)');
+                line.setAttribute('stroke-width', '1');
+                gridGroup.appendChild(line);
+                
+                const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                label.setAttribute('class', 'grid-label');
+                label.setAttribute('x', '10');
+                label.setAttribute('y', y - 5);
+                label.setAttribute('fill', '#aaa');
+                label.setAttribute('font-size', '10');
+                label.textContent = (groundLevel - y) + ' م';
+                gridGroup.appendChild(label);
+            }
+            
+            // خطوط عمودية
+            for (let x = 0; x < svg.clientWidth; x += 50) {
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('class', 'grid-line');
+                line.setAttribute('x1', x);
+                line.setAttribute('y1', '0');
+                line.setAttribute('x2', x);
+                line.setAttribute('y2', groundLevel);
+                line.setAttribute('stroke', 'rgba(255, 255, 255, 0.2)');
+                line.setAttribute('stroke-width', '1');
+                gridGroup.appendChild(line);
+                
+                if (x > 0) {
+                    const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    label.setAttribute('class', 'grid-label');
+                    label.setAttribute('x', x);
+                    label.setAttribute('y', groundLevel - 5);
+                    label.setAttribute('text-anchor', 'middle');
+                    label.setAttribute('fill', '#aaa');
+                    label.setAttribute('font-size', '10');
+                    label.textContent = x + ' م';
+                    gridGroup.appendChild(label);
+                }
+            }
+            
+            svg.appendChild(gridGroup);
+            gridGroup.style.display = showGrid ? 'block' : 'none';
+        }
+        
+        // رسم الجسم
+        function drawObject() {
+            if (objectElement) {
+                svg.removeChild(objectElement);
+            }
+            
+            objectElement = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            objectElement.setAttribute('class', 'object');
+            
+            let obj;
+            switch(objectType) {
+                case 'box':
+                    obj = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                    obj.setAttribute('width', '60');
+                    obj.setAttribute('height', '40');
+                    obj.setAttribute('fill', '#3498db');
+                    obj.setAttribute('stroke', '#2c3e50');
+                    obj.setAttribute('stroke-width', '2');
+                    obj.setAttribute('rx', '3');
+                    objectWidth = 60;
+                    objectHeight = 40;
+                    break;
+                    
+                case 'ball':
+                    obj = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                    obj.setAttribute('r', '30');
+                    obj.setAttribute('fill', '#e74c3c');
+                    obj.setAttribute('stroke', '#c0392b');
+                    obj.setAttribute('stroke-width', '2');
+                    objectWidth = 60;
+                    objectHeight = 60;
+                    break;
+                    
+                case 'car':
+                    const carGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                    
+                    const carBody = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                    carBody.setAttribute('x', '10');
+                    carBody.setAttribute('y', '35');
+                    carBody.setAttribute('width', '80');
+                    carBody.setAttribute('height', '20');
+                    carBody.setAttribute('rx', '5');
+                    carBody.setAttribute('fill', '#3498db');
+                    carBody.setAttribute('stroke', '#2c3e50');
+                    carBody.setAttribute('stroke-width', '2');
+                    
+                    const carTop = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                    carTop.setAttribute('x', '15');
+                    carTop.setAttribute('y', '40');
+                    carTop.setAttribute('width', '70');
+                    carTop.setAttribute('height', '30');
+                    carTop.setAttribute('fill', '#2ecc71');
+                    carTop.setAttribute('stroke', '#27ae58');
+                    carTop.setAttribute('stroke-width', '2');
+                    
+                    const wheel1 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                    wheel1.setAttribute('cx', '25');
+                    wheel1.setAttribute('cy', '70');
+                    wheel1.setAttribute('r', '15');
+                    wheel1.setAttribute('fill', '#343434');
+                    wheel1.setAttribute('stroke', '#2c3e50');
+                    wheel1.setAttribute('stroke-width', '2');
+                    
+                    const wheel2 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                    wheel2.setAttribute('cx', '75');
+                    wheel2.setAttribute('cy', '70');
+                    wheel2.setAttribute('r', '15');
+                    wheel2.setAttribute('fill', '#343434');
+                    wheel2.setAttribute('stroke', '#2c3e50');
+                    wheel2.setAttribute('stroke-width', '2');
+                    
+                    carGroup.appendChild(carBody);
+                    carGroup.appendChild(carTop);
+                    carGroup.appendChild(wheel1);
+                    carGroup.appendChild(wheel2);
+                    obj = carGroup;
+                    objectWidth = 90;
+                    objectHeight = 55;
+                    break;
+            }
+            
+            objectElement.appendChild(obj);
+            svg.appendChild(objectElement);
+            
+            updateObjectPosition();
+        }
+        
+        // رسم نوابض القوة
+        function drawSpring() {
+            if (springElement) {
+                svg.removeChild(springElement);
+            }
+            
+            springElement = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            springElement.setAttribute('stroke', '#e67e22');
+            springElement.setAttribute('stroke-width', '2');
+            springElement.setAttribute('fill', 'none');
+            svg.appendChild(springElement);
+            
+            updateSpring();
+        }
+        
+        // رسم مسار الحركة
+        function drawPath() {
+            if (pathElement) {
+                svg.removeChild(pathElement);
+            }
+            
+            pathElement = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            pathElement.setAttribute('stroke', '#9b59b6');
+            pathElement.setAttribute('stroke-width', '2');
+            pathElement.setAttribute('fill', 'none');
+            pathElement.setAttribute('stroke-dasharray', '5,3');
+            svg.appendChild(pathElement);
+            
+            pathPoints = [];
+            updatePath();
+        }
+        
+        // رسم أسهم القوى
+        function drawVectors() {
+            if (vectorsGroup) {
+                svg.removeChild(vectorsGroup);
+            }
+            
+            vectorsGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            svg.appendChild(vectorsGroup);
+            
+            updateVectors();
+        }
+        
+        // رسم المؤشرات التوضيحية
+        function drawInfoMarkers() {
+            // إنشاء مجموعة العناصر التوضيحية إذا لم تكن موجودة
+            if (!infoMarkersGroup) {
+                infoMarkersGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                infoMarkersGroup.setAttribute('class', 'info-markers');
+                svg.appendChild(infoMarkersGroup);
+            } else {
+                // مسح العناصر القديمة
+                infoMarkersGroup.innerHTML = '';
+            }
+            
+            // إضافة مؤشرات توضيحية
+            const centerX = position + objectWidth/2;
+            const centerY = isOnGround ? groundLevel - objectHeight/2 : groundLevel - objectHeight - objectHeight/2;
+            
+            // مؤشر السرعة
+            addInfoMarker(
+                centerX, 
+                centerY - 40, 
+                `السرعة: ${Math.abs(velocity).toFixed(2)} م/ث`, 
+                '#FF5722',
+                'velocity'
+            );
+            
+            // مؤشر القوة المطبقة
+            if (appliedForce !== 0) {
+                addInfoMarker(
+                    centerX + (appliedForce > 0 ? 60 : -60), 
+                    centerY, 
+                    `القوة: ${Math.abs(appliedForce).toFixed(2)} نيوتن`, 
+                    '#4CAF50',
+                    'applied-force'
+                );
+            }
+            
+            // مؤشر الاحتكاك
+            if (friction > 0 && velocity !== 0 && isOnGround) {
+                addInfoMarker(
+                    centerX + (velocity > 0 ? -60 : 60), 
+                    centerY + 30, 
+                    `الاحتكاك: ${friction.toFixed(2)}`, 
+                    '#2196F3',
+                    'friction'
+                );
+            }
+            
+            // مؤشر الجاذبية
+            if (gravity > 0 && !isOnGround) {
+                addInfoMarker(
+                    centerX, 
+                    centerY + 50, 
+                    `الجاذبية: ${gravity.toFixed(2)}`, 
+                    '#9C27B0',
+                    'gravity'
+                );
+            }
+        }
+        
+        // إضافة مؤشر توضيحي
+        function addInfoMarker(x, y, text, color, id) {
+            const marker = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            marker.setAttribute('class', 'info-marker');
+            if (id) marker.setAttribute('id', id);
+            
+            // خط التوصيل
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', x);
+            line.setAttribute('y1', y);
+            line.setAttribute('x2', x + (x > svg.clientWidth/2 ? -15 : 15));
+            line.setAttribute('y2', y > groundLevel - 100 ? y - 15 : y + 15);
+            line.setAttribute('stroke', color);
+            line.setAttribute('stroke-width', '1');
+            line.setAttribute('stroke-dasharray', '2,2');
+            marker.appendChild(line);
+            
+            // دائرة الخلفية
+            const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            circle.setAttribute('cx', x);
+            circle.setAttribute('cy', y);
+            circle.setAttribute('r', '20');
+            circle.setAttribute('fill', color);
+            circle.setAttribute('opacity', '0.2');
+            marker.appendChild(circle);
+            
+            // النص
+            const textElement = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            textElement.setAttribute('x', x);
+            textElement.setAttribute('y', y + 5);
+            textElement.setAttribute('text-anchor', 'middle');
+            textElement.setAttribute('fill', color);
+            textElement.setAttribute('font-size', '12');
+            textElement.setAttribute('font-weight', 'bold');
+            textElement.textContent = text;
+            marker.appendChild(textElement);
+            
+            infoMarkersGroup.appendChild(marker);
+        }
+        
+        // تحديث موضع الجسم
+        function updateObjectPosition() {
+            let yPos = isOnGround ? groundLevel - objectHeight : groundLevel - objectHeight - 50;
+            
+            if (objectType === 'box') {
+                objectElement.firstChild.setAttribute('x', position);
+                objectElement.firstChild.setAttribute('y', yPos);
+            } else if (objectType === 'ball') {
+                objectElement.firstChild.setAttribute('cx', position + 30);
+                objectElement.firstChild.setAttribute('cy', yPos + 30);
+            } else if (objectType === 'car') {
+                objectElement.setAttribute('transform', `translate(${position - 10}, ${yPos - 35})`);
+            }
+            
+            // تحديث النوابض والمسار والأسهم والمؤشرات
+            updateSpring();
+            updatePath();
+            updateVectors();
+            drawInfoMarkers();
+        }
+        
+        // تحديث النوابض
+        function updateSpring() {
+            if (!springElement) return;
+            
+            const springStart = position - 50;
+            const springEnd = 50;
+            const springHeight = 30;
+            const segments = 10;
+            const segmentWidth = (springStart - springEnd) / segments;
+            
+            let pathData = `M ${springEnd} ${groundLevel - springHeight}`;
+            
+            for (let i = 1; i <= segments; i++) {
+                const x = springEnd + i * segmentWidth;
+                const y = groundLevel - springHeight + (i % 2 === 0 ? -20 : 20);
+                pathData += ` L ${x} ${y}`;
+            }
+            
+            pathData += ` L ${springStart} ${groundLevel - springHeight}`;
+            
+            springElement.setAttribute('d', pathData);
+            
+            // إظهار أو إخفاء النابض حسب القوة المطبقة
+            springElement.style.display = appliedForce !== 0 ? 'block' : 'none';
+        }
+        
+        // تحديث مسار الحركة
+        function updatePath() {
+            if (!pathElement) return;
+            
+            // إضافة نقطة جديدة للمسار كل 10 إطارات
+            if (time % 10 === 0) {
+                const yPos = isOnGround ? groundLevel - objectHeight / 2 : groundLevel - objectHeight - 25;
+                pathPoints.push({ x: position + objectWidth / 2, y: yPos });
+                
+                // الحد من عدد النقاط للحفاظ على الأداء
+                if (pathPoints.length > 100) {
+                    pathPoints.shift();
+                }
+            }
+            
+            // بناء مسار الحركة
+            if (pathPoints.length > 1) {
+                let pathData = `M ${pathPoints[0].x} ${pathPoints[0].y}`;
+                
+                for (let i = 1; i < pathPoints.length; i++) {
+                    pathData += ` L ${pathPoints[i].x} ${pathPoints[i].y}`;
+                }
+                
+                pathElement.setAttribute('d', pathData);
+            }
+        }
+        
+        // تحديث أسهم القوى
+        function updateVectors() {
+            if (!vectorsGroup) return;
+            
+            // مسح الأسهم القديمة
+            vectorsGroup.innerHTML = '';
+            
+            if (!showVectors) return;
+            
+            const centerX = position + objectWidth / 2;
+            const centerY = isOnGround ? groundLevel - objectHeight / 2 : groundLevel - objectHeight - objectHeight / 2;
+            
+            // قوة الدفع (إذا كانت موجودة)
+            if (appliedForce !== 0) {
+                drawVector(centerX, centerY, appliedForce * 50, 0, '#e74c3c', 'القوة المطبقة');
+            }
+            
+            // قوة الاحتكاك (إذا كانت تتحرك)
+            if (velocity !== 0 && isOnGround) {
+                drawVector(centerX, centerY, -Math.sign(velocity) * friction * 500, 0, '#3498db', 'قوة الاحتكاك');
+            }
+            
+            // قوة الجاذبية (إذا كانت مفعلة وغير على الأرض)
+            if (gravity > 0 && !isOnGround) {
+                drawVector(centerX, centerY, 0, gravity * 100, '#2ecc71', 'قوة الجاذبية');
+            }
+            
+            // محصلة القوى
+            let netForceX = appliedForce;
+            if (velocity !== 0 && isOnGround) {
+                netForceX += -Math.sign(velocity) * friction;
+            }
+            
+            let netForceY = 0;
+            if (gravity > 0 && !isOnGround) {
+                netForceY = gravity;
+            }
+            
+            if (netForceX !== 0 || netForceY !== 0) {
+                drawVector(centerX, centerY, netForceX * 50, netForceY * 100, '#f39c12', 'محصلة القوى', true);
+            }
+        }
+        
+        // رسم سهم القوة
+        function drawVector(x, y, dx, dy, color, label, dashed = false) {
+            const endX = x + dx;
+            const endY = y + dy;
+            
+            // الخط الرئيسي
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', x);
+            line.setAttribute('y1', y);
+            line.setAttribute('x2', endX);
+            line.setAttribute('y2', endY);
+            line.setAttribute('stroke', color);
+            line.setAttribute('stroke-width', '2');
+            if (dashed) {
+                line.setAttribute('stroke-dasharray', '5,3');
+            }
+            vectorsGroup.appendChild(line);
+            
+            // رأس السهم
+            const angle = Math.atan2(dy, dx);
+            const arrowSize = 10;
+            
+            const arrow1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            arrow1.setAttribute('x1', endX);
+            arrow1.setAttribute('y1', endY);
+            arrow1.setAttribute('x2', endX - arrowSize * Math.cos(angle - Math.PI/6));
+            arrow1.setAttribute('y2', endY - arrowSize * Math.sin(angle - Math.PI/6));
+            arrow1.setAttribute('stroke', color);
+            arrow1.setAttribute('stroke-width', '2');
+            vectorsGroup.appendChild(arrow1);
+            
+            const arrow2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            arrow2.setAttribute('x1', endX);
+            arrow2.setAttribute('y1', endY);
+            arrow2.setAttribute('x2', endX - arrowSize * Math.cos(angle + Math.PI/6));
+            arrow2.setAttribute('y2', endY - arrowSize * Math.sin(angle + Math.PI/6));
+            arrow2.setAttribute('stroke', color);
+            arrow2.setAttribute('stroke-width', '2');
+            vectorsGroup.appendChild(arrow2);
+            
+            // تسمية القوة
+            const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            text.setAttribute('x', endX + 10 * Math.sign(dx));
+            text.setAttribute('y', endY + 10 * Math.sign(dy));
+            text.setAttribute('fill', color);
+            text.setAttribute('font-size', '12');
+            text.textContent = label;
+            vectorsGroup.appendChild(text);
+        }
+        
+        // تحديث مخطط القوى
+        function updateForceDiagram() {
+            vectorDiagram.innerHTML = '';
+            
+            // حساب القوى
+            let frictionForce = 0;
+            if (velocity !== 0 && isOnGround) {
+                frictionForce = -Math.sign(velocity) * friction;
+            }
+            
+            const netForce = appliedForce + frictionForce;
+            
+            // تحديث القيم الرقمية
+            appliedForceValue.textContent = appliedForce.toFixed(2);
+            frictionForceValue.textContent = frictionForce.toFixed(2);
+            netForceValue.textContent = netForce.toFixed(2);
+            
+            // تحديث العرض المباشر
+            rtVelocity.textContent = Math.abs(velocity).toFixed(2);
+            rtPosition.textContent = Math.abs(position - 150).toFixed(2);
+            rtTime.textContent = time.toFixed(2);
+            rtForce.textContent = appliedForce.toFixed(2);
+            
+            // رسم مخطط القوى
+            const centerX = vectorDiagram.clientWidth / 2;
+            const centerY = vectorDiagram.clientHeight / 2;
+            
+            // القوة المطبقة
+            if (appliedForce !== 0) {
+                drawVectorDiagram(centerX, centerY, appliedForce * 30, 0, '#e74c3c', `F<sub>مطبقة</sub> = ${appliedForce.toFixed(2)}N`);
+            }
+            
+            // قوة الاحتكاك
+            if (frictionForce !== 0) {
+                drawVectorDiagram(centerX, centerY, frictionForce * 30, 0, '#3498db', `F<sub>احتكاك</sub> = ${frictionForce.toFixed(2)}N`);
+            }
+            
+            // محصلة القوى
+            if (netForce !== 0) {
+                drawVectorDiagram(centerX, centerY, netForce * 30, 0, '#f39c12', `F<sub>محصلة</sub> = ${netForce.toFixed(2)}N`, true);
+            }
+            
+            // الجسم
+            const object = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            object.setAttribute('x', centerX - 30);
+            object.setAttribute('y', centerY - 20);
+            object.setAttribute('width', '60');
+            object.setAttribute('height', '40');
+            object.setAttribute('fill', '#bdc3c7');
+            object.setAttribute('stroke', '#7f8c8d');
+            object.setAttribute('stroke-width', '2');
+            vectorDiagram.appendChild(object);
+        }
+        
+        // رسم سهم في مخطط القوى
+        function drawVectorDiagram(x, y, dx, dy, color, label, dashed = false) {
+            const endX = x + dx;
+            const endY = y + dy;
+            
+            // الخط الرئيسي
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', x);
+            line.setAttribute('y1', y);
+            line.setAttribute('x2', endX);
+            line.setAttribute('y2', endY);
+            line.setAttribute('stroke', color);
+            line.setAttribute('stroke-width', '3');
+            if (dashed) {
+                line.setAttribute('stroke-dasharray', '5,3');
+            }
+            vectorDiagram.appendChild(line);
+            
+            // رأس السهم
+            const angle = Math.atan2(dy, dx);
+            const arrowSize = 10;
+            
+            const arrow1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            arrow1.setAttribute('x1', endX);
+            arrow1.setAttribute('y1', endY);
+            arrow1.setAttribute('x2', endX - arrowSize * Math.cos(angle - Math.PI/6));
+            arrow1.setAttribute('y2', endY - arrowSize * Math.sin(angle - Math.PI/6));
+            arrow1.setAttribute('stroke', color);
+            arrow1.setAttribute('stroke-width', '3');
+            vectorDiagram.appendChild(arrow1);
+            
+            const arrow2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            arrow2.setAttribute('x1', endX);
+            arrow2.setAttribute('y1', endY);
+            arrow2.setAttribute('x2', endX - arrowSize * Math.cos(angle + Math.PI/6));
+            arrow2.setAttribute('y2', endY - arrowSize * Math.sin(angle + Math.PI/6));
+            arrow2.setAttribute('stroke', color);
+            arrow2.setAttribute('stroke-width', '3');
+            vectorDiagram.appendChild(arrow2);
+            
+            // تسمية القوة
+            const text = document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
+            text.setAttribute('x', endX + 5 * Math.sign(dx));
+            text.setAttribute('y', endY + 5 * Math.sign(dy));
+            text.setAttribute('width', '100');
+            text.setAttribute('height', '30');
+            
+            const div = document.createElement('div');
+            div.style.color = color;
+            div.style.fontSize = '12px';
+            div.style.fontFamily = 'Tajawal, Arial, sans-serif';
+            div.innerHTML = label;
+            
+            text.appendChild(div);
+            vectorDiagram.appendChild(text);
+        }
+        
+        // تطبيق قوة على الجسم
+        function applyForce(direction) {
+            appliedForce = direction * 0.2;
+            
+            // في حالة الجاذبية، يمكن أن تقفز الكرة
+            if (gravity > 0 && objectType === 'ball' && isOnGround) {
+                isOnGround = false;
+            }
+            
+            updateForceDiagram();
+        }
+        
+        // تطبيق دفعة قوية
+        function applyImpulse(direction) {
+            velocity += direction * 0.5;
+            
+            // في حالة الجاذبية، يمكن أن تقفز الكرة
+            if (gravity > 0 && objectType === 'ball' && isOnGround) {
+                isOnGround = false;
+                velocity += direction * 0.3;
+            }
+            
+            updateForceDiagram();
+        }
+        
+        // تحديث الاحتكاك
+        function updateFriction() {
+            friction = parseFloat(frictionSlider.value);
+            frictionValue.textContent = friction.toFixed(2);
+            updateForceDiagram();
+        }
+        
+        // تحديث الجاذبية
+        function updateGravity() {
+            gravity = parseFloat(gravitySlider.value);
+            gravityValue.textContent = gravity.toFixed(2);
+            
+            if (gravity > 0 && objectType === 'ball') {
+                isOnGround = false;
+            } else {
+                isOnGround = true;
+            }
+            
+            updateForceDiagram();
+        }
+        
+        // تبديل الشبكة
+        function toggleGrid() {
+            showGrid = !showGrid;
+            gridGroup.style.display = showGrid ? 'block' : 'none';
+        }
+        
+        // تبديل الأسهم
+        function toggleVectors() {
+            showVectors = !showVectors;
+            updateVectors();
+        }
+        
+        // إعادة ضبط المحاكاة
+        function resetSimulation() {
+            position = 150;
+            velocity = 0;
+            acceleration = 0;
+            appliedForce = 0;
+            time = 0;
+            isOnGround = true;
+            pathPoints = [];
+            
+            updateObjectPosition();
+            updateForceDiagram();
+            updatePath();
+        }
+        
+        // تبديل التبويبات
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            document.querySelector(`.tab[onclick="switchTab('${tabId}')"]`).classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+            
+            if (tabId === 'vectors') {
+                updateForceDiagram();
+            }
+        }
+        
+        // تغيير نوع الجسم
+        function changeObject(type) {
+            objectType = type;
+            
+            // تحديث الواجهة
+            document.querySelectorAll('.object-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            document.querySelector(`.object-option[data-object="${type}"]`).classList.add('selected');
+            
+            // إعادة الرسم
+            drawObject();
+            resetSimulation();
+        }
+        
+        // عرض المساعدة
+        function showHelp() {
+            alert(`إرشادات استخدام المحاكاة:
+            
+1. اختر نوع الجسم من الأعلى (صندوق، كرة، سيارة)
+2. استخدم أزرار القوة لتطبيق قوة على الجسم
+3. اضبط منزلق الاحتكاك لتغيير مقدار مقاومة الحركة
+4. اضبط منزلق الجاذبية لمشاهدة تأثيرها على الكرة
+5. استخدم الأزرار الأخرى للتحكم في العرض
+            
+في قسم "تحليل القوى" يمكنك رؤية تحليل مفصل للقوى المؤثرة على الجسم.`);
+        }
+        
+        // تبديل وضع ملء الشاشة
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    alert(`خطأ في تشغيل وضع ملء الشاشة: ${err.message}`);
+                });
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+        
+        // دورة الحركة
+        function animate(currentTime) {
+            if (!lastTime) lastTime = currentTime;
+            const deltaTime = (currentTime - lastTime) / 1000;
+            lastTime = currentTime;
+            
+            // تحديث الزمن
+            time += deltaTime;
+            
+            // حساب التسارع (F = ma => a = F/m)
+            let mass = 1; // كتلة افتراضية
+            acceleration = appliedForce / mass;
+            
+            // تطبيق الاحتكاك إذا كان الجسم على الأرض
+            if (isOnGround) {
+                if (velocity > 0) {
+                    acceleration -= friction;
+                } else if (velocity < 0) {
+                    acceleration += friction;
+                }
+            }
+            
+            // تطبيق الجاذبية إذا كانت مفعلة
+            if (gravity > 0 && !isOnGround) {
+                acceleration += gravity;
+            }
+            
+            // تحديث السرعة
+            velocity += acceleration * deltaTime;
+            
+            // تطبيق مقاومة الهواء للكرة في الهواء
+            if (!isOnGround && objectType === 'ball') {
+                velocity *= 0.99;
+            }
+            
+            // تحديث الموقع
+            position += velocity * 100 * deltaTime;
+            
+            // التحقق من حدود الشاشة
+            const svgWidth = svg.clientWidth;
+            
+            if (position < 0) {
+                position = 0;
+                velocity = -velocity * 0.5; // ارتداد
+            } else if (position > svgWidth - objectWidth) {
+                position = svgWidth - objectWidth;
+                velocity = -velocity * 0.5; // ارتداد
+            }
+            
+            // التحقق من الاصطدام بالأرض
+            if (gravity > 0 && !isOnGround) {
+                if (position + objectHeight >= groundLevel) {
+                    position = groundLevel - objectHeight;
+                    isOnGround = true;
+                    velocity *= 0.7; // فقدان بعض الطاقة عند الاصطدام
+                    
+                    // إذا كانت السرعة صغيرة جدًا، توقف الكرة
+                    if (Math.abs(velocity) < 0.05) {
+                        velocity = 0;
+                    }
+                }
+            }
+            
+            // تحديث القيم المعروضة
+            velocityValue.textContent = Math.abs(velocity).toFixed(2);
+            positionValue.textContent = Math.abs(position - 150).toFixed(2);
+            timeValue.textContent = time.toFixed(2);
+            
+            // تحديث العرض المباشر
+            rtVelocity.textContent = Math.abs(velocity).toFixed(2);
+            rtPosition.textContent = Math.abs(position - 150).toFixed(2);
+            rtTime.textContent = time.toFixed(2);
+            rtForce.textContent = appliedForce.toFixed(2);
+            
+            // تحديث العناصر المرئية
+            updateObjectPosition();
+            updateForceDiagram();
+            
+            // الاستمرار في الحركة
+            animationId = requestAnimationFrame(animate);
+        }
+        
+        // تهيئة المحاكاة عند تحميل الصفحة
+        window.onload = initSimulation;
+        
+        // إعادة تهيئة المحاكاة عند تغيير حجم النافذة
+        window.onresize = function() {
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+            }
+            initSimulation();
+        };
+        
+        // تنظيف عند إغلاق الصفحة
+        window.onbeforeunload = function() {
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+            }
+        };
+    </script>
+</body>
+</html>

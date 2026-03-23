@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>محاكاة تفاعلية لظاهرة خسوف القمر</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #000428, #004e92);
+            margin: 0;
+            padding: 20px;
+            color: white;
+            text-align: center;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+        }
+        
+        h1 {
+            color: #FFD700;
+            text-shadow: 2px 2px 4px #000;
+            margin-bottom: 30px;
+        }
+        
+        .simulation-container {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            margin: 20px 0;
+            background-color: #000;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: inset 0 0 50px rgba(0, 0, 100, 0.5);
+        }
+        
+        #eclipse-svg {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+        }
+        
+        .control-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        label {
+            font-weight: bold;
+            color: #FFD700;
+            width: 150px;
+            text-shadow: 1px 1px 2px #000;
+        }
+        
+        input[type="range"] {
+            flex-grow: 1;
+            margin: 0 15px;
+            height: 10px;
+            border-radius: 5px;
+            background: #333;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #FFD700;
+            cursor: pointer;
+            box-shadow: 0 0 5px rgba(0,0,0,0.5);
+        }
+        
+        .value-display {
+            width: 50px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        button {
+            background: linear-gradient(to bottom, #4CAF50, #388E3C);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            font-size: 16px;
+            margin: 10px 5px;
+            min-width: 150px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+        }
+        
+        button:active {
+            transform: translateY(1px);
+        }
+        
+        #start-btn {
+            background: linear-gradient(to bottom, #FF5722, #E64A19);
+            font-size: 18px;
+            padding: 15px 25px;
+        }
+        
+        .info-panel {
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: right;
+            border-right: 4px solid #FFD700;
+        }
+        
+        .eclipse-type {
+            font-size: 28px;
+            font-weight: bold;
+            color: #FFD700;
+            margin: 15px 0;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
+        }
+        
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+        
+        .star {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+            animation: twinkle 2s infinite alternate;
+        }
+        
+        @keyframes twinkle {
+            0% { opacity: 0.3; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1.1); }
+        }
+        
+        @keyframes pulse {
+            0% { filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.7)); }
+            50% { filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.9)); }
+            100% { filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.7)); }
+        }
+        
+        .sun-glow {
+            animation: pulse 3s infinite;
+        }
+        
+        .eclipse-progress {
+            height: 10px;
+            background: #333;
+            border-radius: 5px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(to right, #4CAF50, #8BC34A, #FFC107, #FF5722);
+            width: 0%;
+            transition: width 0.1s;
+        }
+        
+        .moon-phase {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #444;
+        }
+        
+        /* تأثيرات الخسوف الكلي */
+        .total-eclipse .moon {
+            fill: #3a1c1c !important;
+            stroke: #5a2c2c !important;
+        }
+        
+        /* تأثيرات الخسوف الجزئي */
+        .partial-eclipse .moon {
+            fill: #5a4a4a !important;
+            stroke: #7a6a6a !important;
+        }
+        
+        /* تأثيرات خسوف شبه الظل */
+        .penumbral-eclipse .moon {
+            fill: #7a7a7a !important;
+            stroke: #9a9a9a !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>محاكاة تفاعلية لظاهرة خسوف القمر</h1>
+        
+        <div class="simulation-container">
+            <div class="stars" id="stars"></div>
+            <svg id="eclipse-svg" xmlns="http://www.w3.org/2000/svg">
+                <!-- خطوط النجوم (للخلفية) -->
+                <defs>
+                    <pattern id="star-pattern" patternUnits="userSpaceOnUse" width="20" height="20">
+                        <circle cx="10" cy="10" r="0.5" fill="white" opacity="0.7" />
+                    </pattern>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#star-pattern)" opacity="1" />
+                
+                <!-- الشمس -->
+                <circle id="sun" cx="150" cy="250" r="60" fill="url(#sun-gradient)" class="sun-glow" filter="url(#glow)" />
+                
+                <!-- الأرض -->
+                <circle id="earth" cx="450" cy="250" r="40" fill="url(#earth-gradient)" />
+                
+                <!-- القمر -->
+                <g id="moon-group">
+                    <circle id="moon" cx="750" cy="250" r="15" fill="url(#moon-gradient)" stroke="#999" stroke-width="0.5" />
+                    
+                    <!-- فوهات القمر -->
+                    <circle class="moon-crater" cx="745" cy="240" r="2" fill="#999" opacity="0.7" />
+                    <circle class="moon-crater" cx="755" cy="245" r="1.5" fill="#999" opacity="0.7" />
+                    <circle class="moon-crater" cx="750" cy="260" r="2.5" fill="#999" opacity="0.7" />
+                    <circle class="moon-crater" cx="740" cy="255" r="2" fill="#999" opacity="0.7" />
+                </g>
+                
+                <!-- ظل الأرض -->
+                <path id="umbra" fill="url(#umbra-gradient)" opacity="0" />
+                <path id="penumbra" fill="url(#penumbra-gradient)" opacity="0" />
+                
+                <!-- خطوط المدار -->
+                <path d="M50,250 L850,250" stroke="#444" stroke-width="1" stroke-dasharray="5,5" />
+                
+                <!-- التدرجات اللونية والمرشحات -->
+                <defs>
+                    <radialGradient id="sun-gradient" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                        <stop offset="0%" stop-color="#FFD700" />
+                        <stop offset="50%" stop-color="#FF8C00" />
+                        <stop offset="100%" stop-color="#FF4500" />
+                    </radialGradient>
+                    
+                    <radialGradient id="earth-gradient" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                        <stop offset="0%" stop-color="#1E88E5" />
+                        <stop offset="60%" stop-color="#0D47A1" />
+                        <stop offset="100%" stop-color="#082766" />
+                    </radialGradient>
+                    
+                    <radialGradient id="moon-gradient" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                        <stop offset="0%" stop-color="#e0e0e0" />
+                        <stop offset="100%" stop-color="#a0a0a0" />
+                    </radialGradient>
+                    
+                    <radialGradient id="umbra-gradient" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                        <stop offset="0%" stop-color="#3a1c1c" />
+                        <stop offset="100%" stop-color="#1a0c0c" />
+                    </radialGradient>
+                    
+                    <radialGradient id="penumbra-gradient" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                        <stop offset="0%" stop-color="#5a4a4a" stop-opacity="0.7" />
+                        <stop offset="100%" stop-color="#3a2a2a" stop-opacity="0.7" />
+                    </radialGradient>
+                    
+                    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+                        <feGaussianBlur stdDeviation="5" result="blur" />
+                        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                    </filter>
+                </defs>
+            </svg>
+            
+            <div class="moon-phase" id="moon-phase">طور القمر: بدر</div>
+        </div>
+        
+        <div class="eclipse-progress">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        
+        <div class="controls">
+            <button id="start-btn">بدء المحاكاة</button>
+            
+            <div class="control-group">
+                <label for="eclipse-type-select">نوع الخسوف:</label>
+                <select id="eclipse-type-select" style="flex-grow: 1; padding: 8px; border-radius: 5px; background: #333; color: white; border: none;">
+                    <option value="total">خسوف كلي</option>
+                    <option value="partial">خسوف جزئي</option>
+                    <option value="penumbral">خسوف شبه الظل</option>
+                    <option value="custom">مخصص</option>
+                </select>
+            </div>
+            
+            <div class="control-group" id="moon-speed-control">
+                <label for="moon-speed">سرعة المحاكاة:</label>
+                <input type="range" id="moon-speed" min="1" max="5" value="3" step="1">
+                <span class="value-display" id="moon-speed-value">3</span>
+            </div>
+            
+            <div>
+                <button id="pause-btn">إيقاف مؤقت</button>
+                <button id="reset-btn">إعادة الضبط</button>
+            </div>
+        </div>
+        
+        <div class="eclipse-type" id="eclipse-type">جاهز للمحاكاة</div>
+        
+        <div class="info-panel">
+            <h3>شرح تفاعلي لظاهرة خسوف القمر:</h3>
+            <p id="eclipse-explanation">
+                اختر نوع الخسوف من القائمة ثم اضغط على "بدء المحاكاة" لمشاهدة ظاهرة خسوف القمر بشكل واقعي.
+            </p>
+            <p>
+                <strong>خسوف كلي:</strong> يحدث عندما يدخل القمر كاملًا في ظل الأرض، ويأخذ لونًا أحمر داكنًا بسبب انكسار الضوء في الغلاف الجوي للأرض.
+            </p>
+            <p>
+                <strong>خسوف جزئي:</strong> يحدث عندما يدخل جزء فقط من القمر في ظل الأرض.
+            </p>
+            <p>
+                <strong>خسوف شبه الظل:</strong> يحدث عندما يمر القمر في منطقة شبه الظل للأرض، ويصبح إضاءته باهتة دون أن يختفي تمامًا.
+            </p>
+            <p>
+                الخسوف القمري يحدث فقط عندما يكون القمر في طور البدر، ويكون الشمس والأرض والقمر على خط مستقيم.
+            </p>
+        </div>
+    </div>
+
+    <audio id="eclipse-sound" loop>
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-ambient-space-wind-914.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // العناصر الرئيسية
+            const svg = document.getElementById('eclipse-svg');
+            const sun = document.getElementById('sun');
+            const earth = document.getElementById('earth');
+            const moon = document.getElementById('moon');
+            const moonGroup = document.getElementById('moon-group');
+            const umbra = document.getElementById('umbra');
+            const penumbra = document.getElementById('penumbra');
+            const eclipseTypeElement = document.getElementById('eclipse-type');
+            const eclipseExplanation = document.getElementById('eclipse-explanation');
+            const progressBar = document.getElementById('progress-bar');
+            const moonPhaseElement = document.getElementById('moon-phase');
+            
+            // عناصر التحكم
+            const startBtn = document.getElementById('start-btn');
+            const pauseBtn = document.getElementById('pause-btn');
+            const resetBtn = document.getElementById('reset-btn');
+            const eclipseTypeSelect = document.getElementById('eclipse-type-select');
+            const moonSpeedSlider = document.getElementById('moon-speed');
+            const eclipseSound = document.getElementById('eclipse-sound');
+            
+            // عرض القيم
+            const moonSpeedValue = document.getElementById('moon-speed-value');
+            
+            // القيم الابتدائية
+            const sunCx = 150;
+            const sunCy = 250;
+            const sunRadius = 60;
+            const earthCx = 450;
+            const earthCy = 250;
+            const earthRadius = 40;
+            const initialMoonCx = 750;
+            const initialMoonCy = 250;
+            const moonRadius = 15;
+            
+            // حالة المحاكاة
+            let isAnimating = false;
+            let animationId = null;
+            let isPaused = false;
+            let startTime = null;
+            const baseAnimationDuration = 20000; // 20 ثانية للمحاكاة الكاملة
+            
+            // إنشاء النجوم
+            createStars();
+            
+            // تحديث المحاكاة
+            function updateSimulation() {
+                const speed = parseInt(moonSpeedSlider.value);
+                moonSpeedValue.textContent = speed;
+                
+                if (!isAnimating) {
+                    updateEclipseInfo();
+                }
+            }
+            
+            // بدء المحاكاة
+            function startSimulation() {
+                if (isAnimating) return;
+                
+                // إعادة الضبط
+                resetSimulation(true);
+                
+                // تعيين حالة المحاكاة
+                isAnimating = true;
+                isPaused = false;
+                startTime = Date.now();
+                startBtn.disabled = true;
+                pauseBtn.textContent = "إيقاف مؤقت";
+                
+                // تشغيل الصوت
+                eclipseSound.currentTime = 0;
+                eclipseSound.play().catch(e => console.log("لم يتم تشغيل الصوت:", e));
+                
+                // بدء الرسوم المتحركة
+                animateEclipse();
+            }
+            
+            // إيقاف المحاكاة مؤقتاً/استئنافها
+            function togglePause() {
+                if (!isAnimating) return;
+                
+                isPaused = !isPaused;
+                
+                if (isPaused) {
+                    cancelAnimationFrame(animationId);
+                    pauseBtn.textContent = "استئناف";
+                    eclipseSound.pause();
+                } else {
+                    startTime = Date.now() - (progressBar.style.width.replace('%', '') / 100 * getAnimationDuration());
+                    animateEclipse();
+                    eclipseSound.play();
+                }
+            }
+            
+            // إعادة ضبط المحاكاة
+            function resetSimulation(softReset = false) {
+                if (animationId) {
+                    cancelAnimationFrame(animationId);
+                    animationId = null;
+                }
+                
+                isAnimating = false;
+                isPaused = false;
+                startBtn.disabled = false;
+                pauseBtn.textContent = "إيقاف مؤقت";
+                
+                // إعادة تعيين العناصر المرئية
+                progressBar.style.width = "0%";
+                umbra.setAttribute('opacity', '0');
+                penumbra.setAttribute('opacity', '0');
+                moonGroup.setAttribute('transform', 'translate(0, 0)');
+                moon.setAttribute('class', 'moon');
+                
+                // إيقاف الصوت
+                eclipseSound.pause();
+                
+                // إعادة تعيين الواجهة
+                if (!softReset) {
+                    updateEclipseInfo();
+                }
+            }
+            
+            // الحصول على مدة التحريك بناءً على السرعة
+            function getAnimationDuration() {
+                const speed = parseInt(moonSpeedSlider.value);
+                return baseAnimationDuration / speed;
+            }
+            
+            // الرسوم المتحركة للخسوف
+            function animateEclipse() {
+                if (isPaused) return;
+                
+                const now = Date.now();
+                const elapsed = now - startTime;
+                const duration = getAnimationDuration();
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // تحديث شريط التقدم
+                progressBar.style.width = `${progress * 100}%`;
+                
+                // حساب موقع القمر
+                let moonX, moonY;
+                
+                // تحديد مسار القمر بناءً على نوع الخسوف
+                switch(eclipseTypeSelect.value) {
+                    case 'total':
+                        // مسار مباشر للخسوف الكلي
+                        moonX = initialMoonCx - (initialMoonCx - earthCx) * progress * 1.2;
+                        moonY = initialMoonCy;
+                        break;
+                    case 'partial':
+                        // مسار يمر بجزء من ظل الأرض
+                        moonX = initialMoonCx - (initialMoonCx - earthCx) * progress * 1.1;
+                        moonY = initialMoonCy + Math.sin(progress * Math.PI) * 30;
+                        break;
+                    case 'penumbral':
+                        // مسار يمر بشبه الظل فقط
+                        moonX = initialMoonCx - (initialMoonCx - earthCx) * progress;
+                        moonY = initialMoonCy + Math.sin(progress * Math.PI * 2) * 20;
+                        break;
+                    default:
+                        // مسار مخصص
+                        moonX = initialMoonCx - (initialMoonCx - earthCx) * progress * 1.1;
+                        moonY = initialMoonCy;
+                }
+                
+                // تطبيق التحويل على مجموعة القمر
+                moonGroup.setAttribute('transform', `translate(${moonX - initialMoonCx}, ${moonY - initialMoonCy})`);
+                
+                // حساب الظل وتحديث تأثيرات الخسوف
+                updateShadowAndEclipse(moonX, moonY, progress);
+                
+                // الاستمرار في التحريك إذا لم يكتمل
+                if (progress < 1) {
+                    animationId = requestAnimationFrame(animateEclipse);
+                } else {
+                    isAnimating = false;
+                    startBtn.disabled = false;
+                    eclipseSound.pause();
+                }
+            }
+            
+            // تحديث الظل وتأثيرات الخسوف
+            function updateShadowAndEclipse(moonX, moonY, progress) {
+                // حساب المسافة بين الأرض والقمر
+                const dx = earthCx - moonX;
+                const dy = earthCy - moonY;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                // حساب زاوية الظل
+                const angle = Math.atan2(dy, dx);
+                
+                // حساب طول مخروط الظل
+                const shadowLength = earthRadius * 110; // تقديري
+                
+                // إنشاء مسار الظل الكامل (Umbra)
+                const umbraPoints = calculateShadowPath(earthCx, earthCy, earthRadius * 2.7, shadowLength, angle, 1);
+                umbra.setAttribute('d', umbraPoints);
+                
+                // إنشاء مسار شبه الظل (Penumbra)
+                const penumbraPoints = calculateShadowPath(earthCx, earthCy, earthRadius * 3.5, shadowLength * 1.2, angle + Math.PI, 1.2);
+                penumbra.setAttribute('d', penumbraPoints);
+                
+                // حساب نسبة الخسوف
+                let eclipseRatio = 0;
+                let eclipseType = "none";
+                
+                // المسافة بين مركزي الأرض والقمر
+                const centerDistance = Math.sqrt(Math.pow(moonX - earthCx, 2) + Math.pow(moonY - earthCy, 2));
+                
+                // حساب التداخل بين القمر وظل الأرض
+                if (centerDistance < earthRadius * 2.7 + moonRadius) {
+                    // خسوف كلي أو جزئي
+                    eclipseRatio = Math.min(1, (earthRadius * 2.7 + moonRadius - centerDistance) / (2 * moonRadius));
+                    
+                    if (eclipseRatio >= 0.95) {
+                        eclipseType = "total";
+                    } else if (eclipseRatio > 0.1) {
+                        eclipseType = "partial";
+                    }
+                } else if (centerDistance < earthRadius * 3.5 + moonRadius) {
+                    // خسوف شبه الظل
+                    eclipseType = "penumbral";
+                    eclipseRatio = Math.min(1, (earthRadius * 3.5 + moonRadius - centerDistance) / (2 * moonRadius));
+                }
+                
+                // تحديث عتامة الظل
+                umbra.setAttribute('opacity', eclipseType === "total" || eclipseType === "partial" ? 0.8 * eclipseRatio : 0);
+                penumbra.setAttribute('opacity', eclipseType === "penumbral" ? 0.6 * eclipseRatio : 0);
+                
+                // تحديث مظهر القمر بناءً على نوع الخسوف
+                moon.setAttribute('class', `${eclipseType}-eclipse moon`);
+                
+                // تحديث نص نوع الخسوف
+                updateEclipseTypeText(eclipseType, eclipseRatio);
+                
+                // تحديث طور القمر (دائمًا بدر أثناء الخسوف)
+                moonPhaseElement.textContent = "طور القمر: بدر";
+            }
+            
+            // حساب مسار الظل
+            function calculateShadowPath(x, y, radius, length, angle, scale) {
+                const points = [];
+                
+                // النقطة الأمامية (قمة المخروط)
+                const tipX = x + Math.cos(angle) * length * scale;
+                const tipY = y + Math.sin(angle) * length * scale;
+                
+                // نقاط الدائرة الخلفية
+                for (let a = 0; a <= Math.PI * 2; a += Math.PI / 10) {
+                    const px = x + Math.cos(a) * radius;
+                    const py = y + Math.sin(a) * radius;
+                    points.push(`${px},${py}`);
+                }
+                
+                // إغلاق المسار بإضافة النقطة الأمامية والعودة إلى أول نقطة
+                return `M${points.join(' L')} L${tipX},${tipY} Z`;
+            }
+            
+            // تحديث نص نوع الخسوف
+            function updateEclipseTypeText(type, ratio) {
+                switch(type) {
+                    case 'total':
+                        eclipseTypeElement.textContent = "خسوف قمري كلي";
+                        eclipseTypeElement.style.color = "#FF4500";
+                        break;
+                    case 'partial':
+                        const percent = Math.round(ratio * 100);
+                        eclipseTypeElement.textContent = `خسوف قمري جزئي (${percent}%)`;
+                        eclipseTypeElement.style.color = "#FF8C00";
+                        break;
+                    case 'penumbral':
+                        eclipseTypeElement.textContent = "خسوف شبه الظل";
+                        eclipseTypeElement.style.color = "#A0A0A0";
+                        break;
+                    default:
+                        eclipseTypeElement.textContent = "لا يوجد خسوف";
+                        eclipseTypeElement.style.color = "#FFFFFF";
+                }
+            }
+            
+            // تحديث معلومات الخسوف بناءً على الإعدادات الحالية
+            function updateEclipseInfo() {
+                switch(eclipseTypeSelect.value) {
+                    case 'total':
+                        eclipseExplanation.innerHTML = `
+                            <strong>خسوف قمري كلي:</strong> يحدث عندما يدخل القمر كاملًا في ظل الأرض.<br>
+                            خلال الخسوف الكلي، يأخذ القمر لونًا أحمر داكنًا بسبب انكسار الضوء في الغلاف الجوي للأرض.<br>
+                            هذا النوع من الخسوف يمكن رؤيته من أي مكان على الأرض حيث يكون القمر فوق الأفق.
+                        `;
+                        break;
+                    case 'partial':
+                        eclipseExplanation.innerHTML = `
+                            <strong>خسوف قمري جزئي:</strong> يحدث عندما يدخل جزء فقط من القمر في ظل الأرض.<br>
+                            خلال الخسوف الجزئي، يظهر جزء من القمر مظلمًا بينما يبقى الجزء الآخر مضاءً.<br>
+                            يمكن رؤية الخسوف الجزئي من مناطق واسعة من الأرض.
+                        `;
+                        break;
+                    case 'penumbral':
+                        eclipseExplanation.innerHTML = `
+                            <strong>خسوف شبه الظل:</strong> يحدث عندما يمر القمر في منطقة شبه الظل للأرض.<br>
+                            خلال هذا النوع من الخسوف، يصبح القمر باهتًا دون أن يختفي تمامًا.<br>
+                            خسوف شبه الظل قد يكون صعب الملاحظة بالعين المجردة.
+                        `;
+                        break;
+                    default:
+                        eclipseExplanation.innerHTML = `
+                            <strong>وضع مخصص:</strong> يمكنك مشاهدة كيف يختلف الخسوف حسب مسار القمر.<br>
+                            جرب تغيير نوع الخسوف لترى الفرق بين الخسوف الكلي والجزئي وشبه الظل.<br>
+                            الخسوف القمري يحدث دائمًا عندما يكون القمر في طور البدر.
+                        `;
+                }
+                
+                updateEclipseTypeText('none', 0);
+                updateSimulation();
+            }
+            
+            // إنشاء النجوم في الخلفية
+            function createStars() {
+                const starsContainer = document.getElementById('stars');
+                starsContainer.innerHTML = '';
+                
+                for (let i = 0; i < 200; i++) {
+                    const star = document.createElement('div');
+                    star.className = 'star';
+                    
+                    // مواضع وأحجام عشوائية للنجوم
+                    const size = Math.random() * 2 + 0.5;
+                    const left = Math.random() * 100;
+                    const top = Math.random() * 100;
+                    const delay = Math.random() * 2;
+                    const duration = Math.random() * 3 + 1;
+                    
+                    star.style.width = `${size}px`;
+                    star.style.height = `${size}px`;
+                    star.style.left = `${left}%`;
+                    star.style.top = `${top}%`;
+                    star.style.animationDelay = `${delay}s`;
+                    star.style.animationDuration = `${duration}s`;
+                    
+                    starsContainer.appendChild(star);
+                }
+            }
+            
+            // استماع لأحداث التحكم
+            startBtn.addEventListener('click', startSimulation);
+            pauseBtn.addEventListener('click', togglePause);
+            resetBtn.addEventListener('click', resetSimulation);
+            eclipseTypeSelect.addEventListener('change', updateEclipseInfo);
+            moonSpeedSlider.addEventListener('input', updateSimulation);
+            
+            // التهيئة الأولية
+            updateEclipseInfo();
+        });
+    </script>
+</body>
+</html>

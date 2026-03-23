@@ -1,0 +1,2976 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المختبر الافتراضي المحسن - الخلية الجلفانية</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            overflow: hidden;
+            direction: rtl;
+        }
+
+        .lab-container {
+            display: flex;
+            height: 100vh;
+            position: relative;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: black;
+            backdrop-filter: blur(10px);
+            border-left: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 20px;
+            overflow-y: auto;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar h3 {
+            color: whitesmoke;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 18px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .tool-item {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            cursor: grab;
+            text-align: center;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            user-select: none;
+            position: relative;
+        }
+
+        .tool-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .tool-item:active {
+            cursor: grabbing;
+            transform: scale(0.95);
+        }
+
+        /* Solution selector */
+        .solution-selector {
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            border: 2px solid #667eea;
+        }
+
+        .solution-selector label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .solution-selector select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #667eea;
+            border-radius: 5px;
+            font-size: 14px;
+            background: white;
+        }
+
+        /* Solution amount control */
+        .solution-amount {
+            margin: 15px 0;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            border: 2px solid #4CAF50;
+        }
+
+        .solution-amount label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .solution-amount input[type="range"] {
+            width: 100%;
+            margin: 10px 0;
+        }
+
+        .amount-display {
+            text-align: center;
+            font-weight: bold;
+            color: #4CAF50;
+            font-size: 14px;
+        }
+
+        /* Wire orientation control */
+        .wire-control {
+            margin: 15px 0;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            border: 2px solid #FF9800;
+        }
+
+        .wire-control label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .wire-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .wire-btn {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .wire-btn.horizontal {
+            background: #FF9800;
+            color: white;
+        }
+
+        .wire-btn.vertical {
+            background: #2196F3;
+            color: white;
+        }
+
+        .wire-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Ion animation control */
+        .ion-control {
+            margin: 15px 0;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            border: 2px solid #9C27B0;
+        }
+
+        .ion-control label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .ion-speed {
+            width: 100%;
+            margin: 10px 0;
+        }
+
+        .speed-display {
+            text-align: center;
+            font-weight: bold;
+            color: #9C27B0;
+            font-size: 14px;
+        }
+
+        /* Controls */
+        .controls {
+            margin-top: 20px;
+        }
+
+        .control-btn {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .add-solution-btn {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+        }
+
+        .start-btn {
+            background: linear-gradient(45deg, #2196F3, #1976D2);
+            color: white;
+        }
+
+        .stop-btn {
+            background: linear-gradient(45deg, #f44336, #d32f2f);
+            color: white;
+        }
+
+        .conclusion-btn {
+            background: linear-gradient(45deg, #FF9800, #F57C00);
+            color: white;
+        }
+
+        .reaction-details-btn {
+            background: linear-gradient(45deg, #9C27B0, #7B1FA2);
+            color: white;
+        }
+
+        .reset-btn {
+            background: linear-gradient(45deg, #607D8B, #455A64);
+            color: white;
+        }
+
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .control-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+            /* Main lab area */
+.lab-area {
+    flex: 1;
+    position: relative;
+    background: #333333; /* لون رمادي داكن */
+    /* أو يمكنك استخدام اللون الأسود */
+    /* background: #000000; */
+    overflow: hidden;
+
+    /* إضافة ظل خفيف إذا رغبت */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+
+
+        .lab-canvas {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            cursor: default;
+        }
+
+        /* Instructions panel */
+        .instructions-panel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 300px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            z-index: 10;
+        }
+
+        .instructions-panel h4 {
+            color: #333;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 24px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 8px;
+        }
+
+        .instructions-panel ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .instructions-panel li {
+            margin: 8px 0;
+            padding: 8px;
+            background: black;
+            border-radius: 5px;
+            font-size: 16px;
+            color: whitesmoke;
+        }
+
+        /* Explanation panel */
+        .explanation-panel {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            width: 300px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            z-index: 10;
+        }
+
+        .explanation-panel h4 {
+            color: #333;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 16px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 8px;
+        }
+
+        .explanation-panel p {
+            font-size: 12px;
+            line-height: 1.5;
+            color: #333;
+            text-align: justify;
+        }
+
+        /* Modals */
+        .modal {
+            display: none;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 400px;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(15px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            border: 3px solid #667eea;
+            z-index: 1000;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal h4 {
+            color: #333;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 18px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .modal p {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #333;
+            text-align: justify;
+            margin-bottom: 15px;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: #f44336;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .close-btn:hover {
+            background: #d32f2f;
+        }
+
+        /* Atomic visualization */
+        .atomic-display {
+            background: #000;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            position: relative;
+            min-height: 200px;
+        }
+
+        .atom {
+            position: absolute;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .electron-orbit {
+            position: absolute;
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            animation: rotate 3s linear infinite;
+        }
+
+        .electron {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: #FFD700;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #FFD700;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Toast notifications */
+        .toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-size: 16px;
+            z-index: 2000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+
+        /* Enhanced Animation classes */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes glow {
+            0% { box-shadow: 0 0 5px rgba(255, 255, 0, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(255, 255, 0, 0.8); }
+            100% { box-shadow: 0 0 5px rgba(255, 255, 0, 0.5); }
+        }
+
+        @keyframes flow {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(20px); }
+        }
+
+        @keyframes bubble {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(-50px) scale(0.5); opacity: 0; }
+        }
+
+        @keyframes solutionPour {
+            0% { 
+                transform: translateY(-100px) scale(0.5);
+                opacity: 0;
+            }
+            50% {
+                transform: translateY(-50px) scale(0.8);
+                opacity: 0.7;
+            }
+            100% { 
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes ionMove {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(2px, -1px) rotate(90deg); }
+            50% { transform: translate(-1px, 2px) rotate(180deg); }
+            75% { transform: translate(-2px, -1px) rotate(270deg); }
+            100% { transform: translate(0, 0) rotate(360deg); }
+        }
+
+        @keyframes ionAttraction {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(var(--dx), var(--dy)) scale(1.1); }
+            100% { transform: translate(0, 0) scale(1); }
+        }
+
+        @keyframes electrodeFlow {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(-40px) scale(0.8); opacity: 0; }
+        }
+
+        @keyframes ionVibration {
+            0% { transform: translate(0, 0); }
+            10% { transform: translate(-0.5px, -0.5px); }
+            20% { transform: translate(0.5px, -0.5px); }
+            30% { transform: translate(-0.5px, 0.5px); }
+            40% { transform: translate(0.5px, 0.5px); }
+            50% { transform: translate(-0.5px, -0.5px); }
+            60% { transform: translate(0.5px, -0.5px); }
+            70% { transform: translate(-0.5px, 0.5px); }
+            80% { transform: translate(0.5px, 0.5px); }
+            90% { transform: translate(-0.5px, -0.5px); }
+            100% { transform: translate(0, 0); }
+        }
+
+        @keyframes ionGlow {
+            0% { box-shadow: 0 0 5px currentColor; }
+            50% { box-shadow: 0 0 15px currentColor, 0 0 25px currentColor; }
+            100% { box-shadow: 0 0 5px currentColor; }
+        }
+
+        @keyframes solutionLevelChange {
+            0% { transform: scaleY(1); }
+            50% { transform: scaleY(1.05); }
+            100% { transform: scaleY(1); }
+        }
+
+        .pulsing {
+            animation: pulse 1s infinite;
+        }
+
+        .glowing {
+            animation: glow 2s infinite;
+        }
+
+        .flowing {
+            animation: flow 0.5s infinite alternate;
+        }
+
+        .bubbling {
+            animation: bubble 2s infinite;
+        }
+
+        .solution-pouring {
+            animation: solutionPour 2s ease-out;
+        }
+
+        .ion-moving {
+            animation: ionMove 4s ease-in-out infinite;
+        }
+
+        .ion-attracting {
+            animation: ionAttraction 3s ease-in-out infinite;
+        }
+
+        .electrode-flowing {
+            animation: electrodeFlow 2s ease-out infinite;
+        }
+
+        .ion-vibrating {
+            animation: ionVibration 0.8s ease-in-out infinite;
+        }
+
+        .ion-glowing {
+            animation: ionGlow 2s ease-in-out infinite;
+        }
+
+        .solution-level-changing {
+            animation: solutionLevelChange 1s ease-in-out;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 250px;
+            }
+            
+            .instructions-panel,
+            .explanation-panel {
+                width: 250px;
+                font-size: 11px;
+            }
+            
+            .modal {
+                width: 350px;
+                right: 10px;
+                top: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .sidebar {
+                width: 200px;
+                padding: 15px;
+            }
+            
+            .tool-item {
+                padding: 10px;
+                font-size: 12px;
+            }
+            
+            .instructions-panel,
+            .explanation-panel {
+                width: 200px;
+                padding: 15px;
+            }
+            
+            .modal {
+                width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="lab-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <h3>أدوات المختبر</h3>
+            
+            <!-- Tools -->
+            <div class="tool-item" data-tool="zinc-beaker" draggable="true">🧪 إناء نصف خلية الخارصين</div>
+            <div class="tool-item" data-tool="copper-beaker" draggable="true">🧪 إناء نصف خلية النحاس</div>
+            <div class="tool-item" data-tool="bulb" draggable="true">💡 مصباح</div>
+            <div class="tool-item" data-tool="zinc-electrode" draggable="true">⚡ قطب الخارصين (مصعد)</div>
+            <div class="tool-item" data-tool="copper-electrode" draggable="true">⚡ قطب النحاس (مهبط)</div>
+            <div class="tool-item" data-tool="salt-bridge" draggable="true">🌉 جسر ملحي</div>
+            <div class="tool-item" data-tool="wire" draggable="true">🔌 أسلاك توصيل</div>
+
+            <!-- Solution selector -->
+            <div class="solution-selector">
+                <label for="solution-type">نوع المحلول:</label>
+                <select id="solution-type">
+                    <option value="znso4">كبريتات الخارصين ZnSO₄</option>
+                    <option value="cuso4">كبريتات النحاس CuSO₄</option>
+                </select>
+            </div>
+
+            <!-- Solution amount control -->
+            <div class="solution-amount">
+                <label for="solution-amount">كمية المحلول:</label>
+                <input type="range" id="solution-amount" min="10" max="100" value="50">
+                <div class="amount-display" id="amount-display">50%</div>
+            </div>
+
+            <!-- Ion animation control -->
+            <div class="ion-control">
+                <label for="ion-speed">سرعة حركة الأيونات:</label>
+                <input type="range" id="ion-speed" class="ion-speed" min="1" max="10" value="5">
+                <div class="speed-display" id="speed-display">متوسط</div>
+            </div>
+
+            <!-- Wire orientation control -->
+            <div class="wire-control">
+                <label>اتجاه السلك المحدد:</label>
+                <div class="wire-buttons">
+                    <button class="wire-btn horizontal" id="wire-horizontal">أفقي</button>
+                    <button class="wire-btn vertical" id="wire-vertical">رأسي</button>
+                </div>
+            </div>
+
+            <!-- Enhanced controls -->
+            <div class="controls">
+                <button class="control-btn add-solution-btn" id="add-copper-solution">إضافة محلول كبريتات النحاس</button>
+                <button class="control-btn add-solution-btn" id="add-zinc-solution">إضافة محلول كبريتات الخارصين</button>
+                <button class="control-btn start-btn" id="start-simulation">بدء المحاكاة</button>
+                <button class="control-btn reaction-details-btn" id="show-reaction-details">تفاصيل التفاعل</button>
+                <button class="control-btn conclusion-btn" id="show-conclusion">الاستنتاج</button>
+                <button class="control-btn stop-btn" id="stop-simulation">إيقاف المحاكاة</button>
+                <button class="control-btn reset-btn" id="reset-lab">إعادة الضبط</button>
+                
+                <!-- New enhanced controls -->
+<button class="control-btn" id="show-voltage-modal" style="background: linear-gradient(45deg, #4CAF50, #2E7D32); color: white;">عرض جهد الخلية</button>
+
+                <button class="control-btn" id="toggle-voltage-display" style="background: linear-gradient(45deg, #E91E63, #C2185B); color: white;">عرض الجهد الكهربائي</button>
+                <button class="control-btn" id="toggle-electron-flow" style="background: linear-gradient(45deg, #00BCD4, #0097A7); color: white;">تتبع تدفق الإلكترونات</button>
+                <button class="control-btn" id="toggle-temperature-effect" style="background: linear-gradient(45deg, #FF5722, #E64A19); color: white;">تأثير درجة الحرارة</button>
+                <button class="control-btn" id="toggle-concentration-effect" style="background: linear-gradient(45deg, #795548, #5D4037); color: white;">تأثير التركيز</button>
+                <button class="control-btn" id="show-energy-diagram" style="background: linear-gradient(45deg, #3F51B5, #303F9F); color: white;">مخطط الطاقة</button>
+            </div>
+        </div>
+
+        <!-- Main lab area -->
+        <div class="lab-area">
+            <canvas class="lab-canvas" id="lab-canvas"></canvas>
+
+            <!-- Instructions panel -->
+            <div class="instructions-panel">
+                <h4>تعليمات التجربة</h4>
+                <ul>
+                    <li>1. اسحب إناء نصف خلية الخارصين إلى مساحة المختبر</li>
+                    <li>2. اسحب إناء نصف خلية النحاس</li>
+                    <li>3. اسحب قطب الخارصين وقطب النحاس</li>
+                    <li>4. اسحب الجسر الملحي والمصباح</li>
+                    <li>5. اسحب الأسلاك وصل الدائرة</li>
+                    <li>6. انقر على النقاط الصفراء لتوصيل الدائرة</li>
+                    <li>7. أضف محاليل كبريتات النحاس والخارصين</li>
+                    <li>8. ابدأ المحاكاة لرؤية التفاعل</li>
+                    <li>9. اضغط على "تفاصيل التفاعل" لرؤية المعادلات</li>
+                </ul>
+            </div>
+
+            <!-- Explanation panel -->
+            <div class="explanation-panel">
+                <h4>شرح التجربة</h4>
+                <p>
+                    هذه التجربة توضح عمل الخلية الجلفانية. 
+                    في نصف خلية الخارصين، يحدث تأكسد للخارصين (Zn → Zn²⁺ + 2e⁻).
+                    في نصف خلية النحاس، يحدث اختزال لأيونات النحاس (Cu²⁺ + 2e⁻ → Cu).
+                    الجسر الملحي يحافظ على التوازن الكهربائي.
+                    تدفق الإلكترونات من الخارصين إلى النحاس ينتج تياراً كهربائياً يضيء المصباح.
+                </p>
+            </div>
+
+            <!-- Reaction Details Modal -->
+            <div class="modal" id="reaction-details-modal">
+                <button class="close-btn" id="close-reaction-details">×</button>
+                <h4>تفاصيل التفاعل في الخلية الجلفانية</h4>
+                <div id="reaction-details-content">
+                    <div class="atomic-display" id="atomic-display">
+                        <!-- Atomic visualization will be rendered here -->
+                    </div>
+                    <div id="chemical-equations">
+                        <!-- Chemical equations will be displayed here -->
+                    </div>
+                </div>
+            </div>
+
+            
+<!-- Voltage Explanation Modal -->
+<div class="modal" id="voltage-modal">
+    <button class="close-btn" id="close-voltage-modal">×</button>
+    <h4>شرح جهد الخلية الجلفانية</h4>
+    <div id="voltage-content" style="font-size:14px; line-height:1.6; text-align:right;">
+        <!-- سيتم تعبئته بالجافاسكربت -->
+    </div>
+</div>
+
+<!-- Conclusion modal -->
+            <div class="modal" id="conclusion-modal">
+                <button class="close-btn" id="close-conclusion">×</button>
+                <h4>استنتاج التجربة</h4>
+                <div id="conclusion-content">
+                    <!-- Content will be filled by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast notification -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // Global variables
+        let canvas, ctx;
+        let isDragging = false;
+        let dragOffset = { x: 0, y: 0 };
+        let currentDragItem = null;
+        let labItems = [];
+        let isSimulationRunning = false;
+        let animationId = null;
+        let particles = [];
+        let electrons = [];
+        let bubbles = [];
+        let connections = [];
+        let connectionPoints = [];
+        let selectedConnectionPoint = null;
+        let solutionAmount = 50;
+        let wireOrientation = 'horizontal';
+        let toolsLocked = false;
+        let electrodeIons = [];
+        let ionSpeed = 5;
+        let ionAnimationTime = 0;
+        let solutionLevelAnimating = false;
+        let selectedWire = null;
+
+        // Enhanced features variables
+        let solutionAmountZn = 50;
+        let solutionAmountCu = 50;
+        let showVoltageDisplay = false;
+        let showElectronFlow = false;
+        let temperatureEffect = false;
+        let concentrationEffect = false;
+        let currentVoltage = 1.1; // Standard cell potential for Zn-Cu cell
+        let temperature = 25; // Celsius
+        let electronFlowParticles = [];
+        let voltageReadings = [];
+        let energyLevels = [];
+        let reactionRate = 1.0;
+        let concentrationZn = 1.0; // Molar
+        let concentrationCu = 1.0; // Molar
+
+        // Lab state
+        let labState = {
+            hasZincBeaker: false,
+            hasCopperBeaker: false,
+            hasBulb: false,
+            hasZincElectrode: false,
+            hasCopperElectrode: false,
+            hasSaltBridge: false,
+            hasWires: false,
+            isConnected: false,
+            hasZincSolution: false,
+            hasCopperSolution: false,
+            solutionType: 'znso4'
+        };
+
+        // Initialize the lab
+        document.addEventListener('DOMContentLoaded', function() {
+            canvas = document.getElementById('lab-canvas');
+            ctx = canvas.getContext('2d');
+            
+            // Set canvas size
+            resizeCanvas();
+            
+            // Initialize event listeners
+            setupEventListeners();
+            
+            // Show welcome message
+            showToast('مرحباً بك في مختبر الخلية الجلفانية الافتراضي!');
+            
+            // Initial canvas draw
+            redrawCanvas();
+        });
+
+        function resizeCanvas() {
+            const labArea = document.querySelector('.lab-area');
+            canvas.width = labArea.clientWidth;
+            canvas.height = labArea.clientHeight;
+            redrawCanvas();
+        }
+
+        function setupEventListeners() {
+            // Tool dragging from sidebar
+            const toolItems = document.querySelectorAll('.tool-item');
+            toolItems.forEach(tool => {
+                tool.addEventListener('dragstart', handleDragStart);
+                tool.addEventListener('dragend', handleDragEnd);
+                
+                // Touch events for mobile
+                tool.addEventListener('touchstart', handleTouchStart, { passive: false });
+                tool.addEventListener('touchmove', handleTouchMove, { passive: false });
+                tool.addEventListener('touchend', handleTouchEnd, { passive: false });
+            });
+
+            // Canvas drop events
+            canvas.addEventListener('dragover', handleDragOver);
+            canvas.addEventListener('drop', handleDrop);
+            
+            // Canvas mouse events for moving items and connections
+            canvas.addEventListener('mousedown', handleCanvasMouseDown);
+            canvas.addEventListener('mousemove', handleCanvasMouseMove);
+            canvas.addEventListener('mouseup', handleCanvasMouseUp);
+            canvas.addEventListener('click', handleCanvasClick);
+            
+            // Canvas touch events for mobile
+            canvas.addEventListener('touchstart', handleCanvasTouchStart, { passive: false });
+            canvas.addEventListener('touchmove', handleCanvasTouchMove, { passive: false });
+            canvas.addEventListener('touchend', handleCanvasTouchEnd, { passive: false });
+
+            // Control buttons
+            document.getElementById('add-copper-solution').addEventListener('click', () => addSolution('copper'));
+            document.getElementById('add-zinc-solution').addEventListener('click', () => addSolution('zinc'));
+            document.getElementById('start-simulation').addEventListener('click', startSimulation);
+            document.getElementById('stop-simulation').addEventListener('click', stopSimulation);
+            document.getElementById('show-reaction-details').addEventListener('click', showReactionDetails);
+            document.getElementById('show-conclusion').addEventListener('click', showConclusion);
+            document.getElementById('reset-lab').addEventListener('click', resetLab);
+            document.getElementById('close-reaction-details').addEventListener('click', closeReactionDetails);
+            document.getElementById('close-conclusion').addEventListener('click', closeConclusion);
+
+            // Enhanced feature buttons
+            document.getElementById('toggle-voltage-display').addEventListener('click', toggleVoltageDisplay);
+            document.getElementById('toggle-electron-flow').addEventListener('click', toggleElectronFlow);
+            document.getElementById('toggle-temperature-effect').addEventListener('click', toggleTemperatureEffect);
+            document.getElementById('toggle-concentration-effect').addEventListener('click', toggleConcentrationEffect);
+            document.getElementById('show-energy-diagram').addEventListener('click', showEnergyDiagram);
+
+            // Solution controls
+            document.getElementById('solution-type').addEventListener('change', function() {
+                labState.solutionType = this.value;
+            });
+
+            document.getElementById('solution-amount').addEventListener('input', function() {
+                const newAmount = parseInt(this.value);
+                updateSolutionAmount(newAmount);
+            });
+
+            // Ion speed control
+            document.getElementById('ion-speed').addEventListener('input', function() {
+                ionSpeed = parseInt(this.value);
+                const speedLabels = ['بطيء جداً', 'بطيء', 'بطيء نسبياً', 'متوسط بطيء', 'متوسط', 'متوسط سريع', 'سريع نسبياً', 'سريع', 'سريع جداً', 'أقصى سرعة'];
+                document.getElementById('speed-display').textContent = speedLabels[ionSpeed - 1];
+            });
+
+            // Wire orientation controls
+            document.getElementById('wire-horizontal').addEventListener('click', function() {
+                updateSelectedWireOrientation('horizontal');
+            });
+
+            document.getElementById('wire-vertical').addEventListener('click', function() {
+                updateSelectedWireOrientation('vertical');
+            });
+
+            
+        // Voltage Modal Events
+        document.getElementById('show-voltage-modal').addEventListener('click', () => {
+            updateVoltageModal();
+            document.getElementById('voltage-modal').style.display = 'block';
+        });
+
+        document.getElementById('close-voltage-modal').addEventListener('click', () => {
+            document.getElementById('voltage-modal').style.display = 'none';
+        });
+
+        function updateVoltageModal() {
+            const E_standard = 1.10;
+            const n = 2;
+            const cuConc = solutionAmountCu / 100 || 0.01;
+            const znConc = solutionAmountZn / 100 || 0.01;
+            const Q = znConc / cuConc;
+            const nernst = E_standard - (0.0591 / n) * Math.log10(Q);
+            const voltage = parseFloat(nernst.toFixed(2));
+
+            let html = `
+                <b>المعادلة الأساسية:</b><br>
+                E<sub>cell</sub> = E<sub>cathode</sub> - E<sub>anode</sub><br>
+                = 0.34 - (-0.76) = <b>1.10 V</b><br><br>
+                <b>معادلة نرنست:</b><br>
+                E = 1.10 - (0.0591 / 2) × log([Zn²⁺]/[Cu²⁺])<br>
+                [Zn²⁺] = ${znConc.toFixed(2)} M<br>
+                [Cu²⁺] = ${cuConc.toFixed(2)} M<br>
+                <b>الجهد الفعلي = ${voltage} V</b>
+            `;
+
+            document.getElementById('voltage-content').innerHTML = html;
+        }
+
+            // Window resize
+            window.addEventListener('resize', resizeCanvas);
+        }
+
+        function updateSolutionAmount(newAmount) {
+            const oldAmount = solutionAmount;
+            solutionAmount = newAmount;
+            document.getElementById('amount-display').textContent = solutionAmount + '%';
+            
+            // Update solution level in beakers if they exist and have solution
+            const zincBeaker = labItems.find(item => item.type === 'zinc-beaker');
+            const copperBeaker = labItems.find(item => item.type === 'copper-beaker');
+            
+            if (zincBeaker && zincBeaker.hasSolution) {
+                animateSolutionLevelChange(zincBeaker, oldAmount, newAmount);
+            }
+            if (copperBeaker && copperBeaker.hasSolution) {
+                animateSolutionLevelChange(copperBeaker, oldAmount, newAmount);
+            }
+        }
+
+        function animateSolutionLevelChange(beaker, oldLevel, newLevel) {
+            if (solutionLevelAnimating) return;
+            
+            solutionLevelAnimating = true;
+            const startTime = Date.now();
+            const duration = 1000; // 1 second animation
+            
+            function animate() {
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // Smooth easing function
+                const easeProgress = 1 - Math.pow(1 - progress, 3);
+                
+                beaker.solutionLevel = oldLevel + (newLevel - oldLevel) * easeProgress;
+                
+                if (progress < 1) {
+                    redrawCanvas();
+                    requestAnimationFrame(animate);
+                } else {
+                    beaker.solutionLevel = newLevel;
+                    solutionLevelAnimating = false;
+                    redrawCanvas();
+                    
+                    // Show toast message
+                    if (newLevel > oldLevel) {
+                        showToast(`تم زيادة مستوى المحلول إلى ${newLevel}%`);
+                    } else {
+                        showToast(`تم تقليل مستوى المحلول إلى ${newLevel}%`);
+                    }
+                }
+            }
+            
+            animate();
+        }
+
+        // Drag and drop handlers
+        function handleDragStart(e) {
+            if (toolsLocked) {
+                e.preventDefault();
+                showToast('الأدوات محمية أثناء المحاكاة');
+                return;
+            }
+            const toolType = e.target.dataset.tool;
+            e.dataTransfer.setData('text/plain', toolType);
+            e.target.style.opacity = '0.5';
+        }
+
+        function handleDragEnd(e) {
+            e.target.style.opacity = '1';
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+        }
+
+        function handleDrop(e) {
+            if (toolsLocked) {
+                showToast('الأدوات محمية أثناء المحاكاة');
+                return;
+            }
+            e.preventDefault();
+            const toolType = e.dataTransfer.getData('text/plain');
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            addToolToLab(toolType, x, y);
+        }
+
+        // Touch handlers for mobile
+        let touchStartPos = { x: 0, y: 0 };
+        let draggedTool = null;
+
+        function handleTouchStart(e) {
+            if (toolsLocked) {
+                e.preventDefault();
+                showToast('الأدوات محمية أثناء المحاكاة');
+                return;
+            }
+            e.preventDefault();
+            const touch = e.touches[0];
+            touchStartPos.x = touch.clientX;
+            touchStartPos.y = touch.clientY;
+            draggedTool = e.target.dataset.tool;
+            e.target.style.opacity = '0.5';
+        }
+
+        function handleTouchMove(e) {
+            e.preventDefault();
+        }
+
+        function handleTouchEnd(e) {
+            e.preventDefault();
+            e.target.style.opacity = '1';
+            
+            if (draggedTool && !toolsLocked) {
+                const touch = e.changedTouches[0];
+                const canvasRect = canvas.getBoundingClientRect();
+                
+                if (touch.clientX >= canvasRect.left && touch.clientX <= canvasRect.right &&
+                    touch.clientY >= canvasRect.top && touch.clientY <= canvasRect.bottom) {
+                    
+                    const x = touch.clientX - canvasRect.left;
+                    const y = touch.clientY - canvasRect.top;
+                    addToolToLab(draggedTool, x, y);
+                }
+                
+                draggedTool = null;
+            }
+        }
+
+        // Canvas interaction handlers
+        function handleCanvasMouseDown(e) {
+            if (toolsLocked) return;
+            
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            const item = getItemAt(x, y);
+            if (item) {
+                isDragging = true;
+                currentDragItem = item;
+                dragOffset.x = x - item.x;
+                dragOffset.y = y - item.y;
+                canvas.style.cursor = 'grabbing';
+
+                // Select wire if clicked
+                if (item.type === 'wire') {
+                    selectedWire = item;
+                    showToast('تم تحديد السلك. يمكنك الآن تغيير اتجاهه.');
+                } else {
+                    selectedWire = null;
+                }
+            }
+        }
+
+        function handleCanvasMouseMove(e) {
+            if (!isDragging || !currentDragItem || toolsLocked) return;
+            
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            currentDragItem.x = x - dragOffset.x;
+            currentDragItem.y = y - dragOffset.y;
+            
+            // Keep item within canvas bounds
+            currentDragItem.x = Math.max(0, Math.min(canvas.width - currentDragItem.width, currentDragItem.x));
+            currentDragItem.y = Math.max(0, Math.min(canvas.height - currentDragItem.height, currentDragItem.y));
+            
+            // Update connection points
+            updateConnectionPoints();
+            redrawCanvas();
+        }
+
+        function handleCanvasMouseUp() {
+            if (isDragging) {
+                isDragging = false;
+                currentDragItem = null;
+                canvas.style.cursor = 'default';
+                updateConnectionPoints();
+            }
+        }
+
+        function handleCanvasClick(e) {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            // Check if clicked on a connection point
+            const clickedPoint = getConnectionPointAt(x, y);
+            if (clickedPoint) {
+                handleConnectionPointClick(clickedPoint);
+            }
+        }
+
+        // Touch handlers for canvas
+        function handleCanvasTouchStart(e) {
+            if (toolsLocked) return;
+            
+            e.preventDefault();
+            const touch = e.touches[0];
+            const rect = canvas.getBoundingClientRect();
+            const x = touch.clientX - rect.left;
+            const y = touch.clientY - rect.top;
+            
+            // Check for connection point first
+            const clickedPoint = getConnectionPointAt(x, y);
+            if (clickedPoint) {
+                handleConnectionPointClick(clickedPoint);
+                return;
+            }
+            
+            const item = getItemAt(x, y);
+            if (item) {
+                isDragging = true;
+                currentDragItem = item;
+                dragOffset.x = x - item.x;
+                dragOffset.y = y - item.y;
+
+                // Select wire if touched
+                if (item.type === 'wire') {
+                    selectedWire = item;
+                    showToast('تم تحديد السلك. يمكنك الآن تغيير اتجاهه.');
+                } else {
+                    selectedWire = null;
+                }
+            }
+        }
+
+        function handleCanvasTouchMove(e) {
+            if (!isDragging || !currentDragItem || toolsLocked) return;
+            
+            e.preventDefault();
+            const touch = e.touches[0];
+            const rect = canvas.getBoundingClientRect();
+            const x = touch.clientX - rect.left;
+            const y = touch.clientY - rect.top;
+            
+            currentDragItem.x = x - dragOffset.x;
+            currentDragItem.y = y - dragOffset.y;
+            
+            // Keep item within canvas bounds
+            currentDragItem.x = Math.max(0, Math.min(canvas.width - currentDragItem.width, currentDragItem.x));
+            currentDragItem.y = Math.max(0, Math.min(canvas.height - currentDragItem.height, currentDragItem.y));
+            
+            updateConnectionPoints();
+            redrawCanvas();
+        }
+
+        function handleCanvasTouchEnd(e) {
+            e.preventDefault();
+            if (isDragging) {
+                isDragging = false;
+                currentDragItem = null;
+                updateConnectionPoints();
+            }
+        }
+
+        function addToolToLab(toolType, x, y) {
+            const newItem = createLabItem(toolType, x, y);
+            if (newItem) {
+                labItems.push(newItem);
+                updateLabState(toolType, true);
+                updateConnectionPoints();
+                redrawCanvas();
+                showToast(`تم إضافة ${getToolName(toolType)} إلى المختبر`);
+            }
+        }
+
+        function createLabItem(type, x, y) {
+            const item = {
+                type: type,
+                x: x,
+                y: y,
+                width: 60,
+                height: 60,
+                connected: false,
+                id: Date.now() + Math.random()
+            };
+
+            switch (type) {
+                case 'zinc-beaker':
+                    item.width = 200;
+                    item.height = 200;
+                    item.color = '#e8f5e8';
+                    item.hasSolution = false;
+                    item.solutionLevel = 0;
+                    item.solutionColor = '#c8e6c9';
+                    item.solutionSymbol = 'ZnSO₄';
+                    item.ion1 = 'Zn²⁺';
+                    item.ion2 = 'SO₄²⁻';
+                    break;
+                case 'copper-beaker':
+                    item.width = 200;
+                    item.height = 200;
+                    item.color = '#e3f2fd';
+                    item.hasSolution = false;
+                    item.solutionLevel = 0;
+                    item.solutionColor = '#2196f3';
+                    item.solutionSymbol = 'CuSO₄';
+                    item.ion1 = 'Cu²⁺';
+                    item.ion2 = 'SO₄²⁻';
+                    break;
+                case 'bulb':
+                    item.width = 100;
+                    item.height = 100;
+                    item.color = '#FFD700';
+                    item.isOn = false;
+                    break;
+                case 'zinc-electrode':
+                    item.width = 40;
+                    item.height = 300;
+                    item.color = '#9E9E9E';
+                    item.charge = '-';
+                    item.symbol = 'Zn';
+                    break;
+                case 'copper-electrode':
+                    item.width = 40;
+                    item.height = 300;
+                    item.color = '#FF6B35';
+                    item.charge = '+';
+                    item.symbol = 'Cu';
+                    break;
+                case 'salt-bridge':
+                    item.width = 300;
+                    item.height = 200; // Increased height for U-shape
+                    item.color = '#FFC107';
+                    break;
+                case 'wire':
+                    if (wireOrientation === 'horizontal') {
+                        item.width = 100;
+                        item.height = 10;
+                    } else {
+                        item.width = 10;
+                        item.height = 100;
+                    }
+                    item.color = '#8B4513';
+                    item.orientation = wireOrientation;
+                    break;
+                default:
+                    return null;
+            }
+
+            return item;
+        }
+
+        function updateSelectedWireOrientation(orientation) {
+            if (!selectedWire) {
+                showToast('الرجاء تحديد سلك أولاً لتغيير اتجاهه');
+                return;
+            }
+
+            if (selectedWire.orientation !== orientation) {
+                selectedWire.orientation = orientation;
+                if (orientation === 'horizontal') {
+                    selectedWire.width = 100;
+                    selectedWire.height = 10;
+                } else {
+                    selectedWire.width = 10;
+                    selectedWire.height = 100;
+                }
+                updateConnectionPoints();
+                redrawCanvas();
+                showToast(`تم تغيير اتجاه السلك المحدد إلى ${orientation === 'horizontal' ? 'أفقي' : 'رأسي'}`);
+            }
+        }
+
+        function getItemAt(x, y) {
+            for (let i = labItems.length - 1; i >= 0; i--) {
+                const item = labItems[i];
+                if (x >= item.x && x <= item.x + item.width &&
+                    y >= item.y && y <= item.y + item.height) {
+                    return item;
+                }
+            }
+            return null;
+        }
+
+        function updateConnectionPoints() {
+            connectionPoints = [];
+            
+            labItems.forEach(item => {
+                switch (item.type) {
+                    case 'wire':
+                        if (item.orientation === 'horizontal') {
+                            connectionPoints.push({
+                                x: item.x,
+                                y: item.y + item.height/2,
+                                itemId: item.id,
+                                type: 'wire_start'
+                            });
+                            connectionPoints.push({
+                                x: item.x + item.width,
+                                y: item.y + item.height/2,
+                                itemId: item.id,
+                                type: 'wire_end'
+                            });
+                        } else {
+                            connectionPoints.push({
+                                x: item.x + item.width/2,
+                                y: item.y,
+                                itemId: item.id,
+                                type: 'wire_start'
+                            });
+                            connectionPoints.push({
+                                x: item.x + item.width/2,
+                                y: item.y + item.height,
+                                itemId: item.id,
+                                type: 'wire_end'
+                            });
+                        }
+                        break;
+                    case 'bulb':
+                        connectionPoints.push({
+                            x: item.x + item.width/4,
+                            y: item.y + item.height - 5,
+                            itemId: item.id,
+                            type: 'bulb_positive'
+                        });
+                        connectionPoints.push({
+                            x: item.x + 3*item.width/4,
+                            y: item.y + item.height - 5,
+                            itemId: item.id,
+                            type: 'bulb_negative'
+                        });
+                        break;
+                    case 'zinc-electrode':
+                    case 'copper-electrode':
+                        connectionPoints.push({
+                            x: item.x + item.width/2,
+                            y: item.y,
+                            itemId: item.id,
+                            type: item.type + '_connection'
+                        });
+                        break;
+                }
+            });
+        }
+
+        function getConnectionPointAt(x, y) {
+            const tolerance = 15;
+            return connectionPoints.find(point => {
+                const distance = Math.sqrt(Math.pow(x - point.x, 2) + Math.pow(y - point.y, 2));
+                return distance <= tolerance;
+            });
+        }
+
+        function handleConnectionPointClick(point) {
+            if (!selectedConnectionPoint) {
+                selectedConnectionPoint = point;
+                point.selected = true;
+                showToast('تم اختيار نقطة التوصيل. انقر على نقطة أخرى للتوصيل');
+            } else {
+                if (selectedConnectionPoint.itemId !== point.itemId) {
+                    // Create connection
+                    connections.push({
+                        from: selectedConnectionPoint,
+                        to: point,
+                        id: Date.now()
+                    });
+                    showToast('تم إنشاء التوصيل بنجاح!');
+                    checkCircuitConnection();
+                } else {
+                    showToast('لا يمكن توصيل النقطة بنفسها');
+                }
+                
+                selectedConnectionPoint.selected = false;
+                selectedConnectionPoint = null;
+            }
+            redrawCanvas();
+        }
+
+        function checkCircuitConnection() {
+            const hasWireConnections = connections.length >= 3;
+            const hasBulbConnection = connections.some(conn => 
+                conn.from.type.includes('bulb') || conn.to.type.includes('bulb')
+            );
+            const hasElectrodeConnection = connections.some(conn => 
+                conn.from.type.includes('electrode') || conn.to.type.includes('electrode')
+            );
+            
+            labState.isConnected = hasWireConnections && hasBulbConnection && hasElectrodeConnection;
+            
+            if (labState.isConnected) {
+                showToast('الدائرة متصلة بشكل صحيح!');
+            }
+        }
+
+        function addSolution(type) {
+            if (type === 'copper') {
+                const copperBeaker = labItems.find(item => item.type === 'copper-beaker');
+                
+                if (!copperBeaker) {
+                    showToast('يجب إضافة إناء نصف خلية النحاس أولاً!');
+                    return;
+                }
+                
+                copperBeaker.hasSolution = true;
+                copperBeaker.solutionLevel = solutionAmount;
+                labState.hasCopperSolution = true;
+                solutionAmountCu = solutionAmount;
+                
+                showToast(`تم إضافة محلول كبريتات النحاس إلى الإناء بكمية ${solutionAmount}%`);
+                
+            } else if (type === 'zinc') {
+                const zincBeaker = labItems.find(item => item.type === 'zinc-beaker');
+                
+                if (!zincBeaker) {
+                    showToast('يجب إضافة إناء نصف خلية الخارصين أولاً!');
+                    return;
+                }
+                
+                zincBeaker.hasSolution = true;
+                zincBeaker.solutionLevel = solutionAmount;
+                labState.hasZincSolution = true;
+                solutionAmountZn = solutionAmount;
+                
+                showToast(`تم إضافة محلول كبريتات الخارصين إلى الإناء بكمية ${solutionAmount}%`);
+            }
+            
+            redrawCanvas();
+        }
+
+        function startSimulation() {
+
+
+            // بعد 30 ثانية: تآكل قطب الخارصين وترسب تدريجي على قطب النحاس
+            setTimeout(() => {
+    const zincElectrode = labItems.find(item => item.type === 'zinc-electrode');
+    const copperElectrode = labItems.find(item => item.type === 'copper-electrode');
+    
+    if (zincElectrode) {
+        let steps = 0;
+        const corrosion = setInterval(() => {
+            // زيادة التآكل بشكل أكبر ولكن ليس بالكامل
+            zincElectrode.height -= 1.0;   // تقليل الارتفاع بمقدار 1.0
+            zincElectrode.width -= 0.4;     // تقليل العرض بمقدار 0.4
+            zincElectrode.y += 0.5;         // تحريك القطب قليلاً للأسفل
+            zincElectrode.color = '#A9A9A9'; // تغيير اللون
+            steps++;
+            if (steps >= 20) clearInterval(corrosion); // عدد الخطوات، 20 خطوة
+        }, 400);
+    }
+
+    if (copperElectrode) {
+        let growth = 0;
+        const deposit = setInterval(() => {
+            copperElectrode.extraLayer = copperElectrode.extraLayer || [];
+            copperElectrode.extraLayer.push({
+                x: copperElectrode.x + 5 + Math.random() * (copperElectrode.width - 10),
+                y: copperElectrode.y + 10 + Math.random() * (copperElectrode.height - 20),
+                size: 4 + Math.random() * 4,
+                color: '#FFD700' // لون الترسب (ذهبي)
+            });
+
+            // إضافة تأثيرات سوداء على جوانب القطب النحاس
+            for (let i = 0; i < 3; i++) { // إضافة 3 مواد سوداء في كل مرة
+                const blackX = copperElectrode.x + Math.random() * copperElectrode.width;
+                const blackY = copperElectrode.y + Math.random() * copperElectrode.height;
+                copperElectrode.extraLayer.push({
+                    x: blackX,
+                    y: blackY,
+                    size: 3 + Math.random() * 3, // حجم المادة السوداء
+                    color: '#000000' // لون المادة السوداء
+                });
+            }
+
+            copperElectrode.color = '#CD7F32'; // لون النحاس اللامع
+            growth++;
+            if (growth >= 30) clearInterval(deposit);
+        }, 400);
+    }
+}, 30000);
+
+if (!validateSetup()) return;
+
+isSimulationRunning = true;
+toolsLocked = true;
+ionAnimationTime = 0;
+
+// تشغيل المصباح بعد 3 ثوانٍ
+setTimeout(() => {
+    const bulb = labItems.find(item => item.type === 'bulb');
+    if (bulb) {
+        bulb.isOn = true;
+        showToast('المصباح يضيء! التيار يمر عبر الدائرة');
+    }
+}, 3000);
+
+if (!validateSetup()) return;
+
+isSimulationRunning = true;
+toolsLocked = true;
+ionAnimationTime = 0;
+
+// تشغيل المصباح بعد 3 ثوانٍ
+setTimeout(() => {
+    const bulb = labItems.find(item => item.type === 'bulb');
+    if (bulb) {
+        bulb.isOn = true;
+        showToast('المصباح يضيء! التيار يمر عبر الدائرة');
+    }
+}, 3000);
+
+if (!validateSetup()) return;
+
+isSimulationRunning = true;
+toolsLocked = true;
+ionAnimationTime = 0;
+
+// تشغيل المصباح بعد 3 ثوانٍ
+setTimeout(() => {
+    const bulb = labItems.find(item => item.type === 'bulb');
+    if (bulb) {
+        bulb.isOn = true;
+        showToast('المصباح يضيء! التيار يمر عبر الدائرة');
+    }
+}, 3000);
+
+    // Initialize simulation elements
+            initializeSimulationElements();
+            
+            // Start animation
+            animate();
+            
+            showToast('بدأت المحاكاة... الأدوات محمية الآن');
+        }
+
+        function stopSimulation() {
+            isSimulationRunning = false;
+            toolsLocked = false;
+            
+            const bulb = labItems.find(item => item.type === 'bulb');
+            if (bulb) {
+                bulb.isOn = false;
+            }
+            
+            particles = [];
+            electrons = [];
+            electrodeIons = [];
+            
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+                animationId = null;
+            }
+            
+            redrawCanvas();
+            showToast('تم إيقاف المحاكاة وإلغاء حماية الأدوات');
+        }
+
+        function validateSetup() {
+            if (!labState.hasZincBeaker) {
+                showToast('يجب إضافة إناء نصف خلية الخارصين أولاً!');
+                return false;
+            }
+            
+            if (!labState.hasCopperBeaker) {
+                showToast('يجب إضافة إناء نصف خلية النحاس أولاً!');
+                return false;
+            }
+            
+            if (!labState.hasBulb) {
+                showToast('يجب إضافة المصباح!');
+                return false;
+            }
+            
+            if (!labState.hasZincElectrode || !labState.hasCopperElectrode) {
+                showToast('يجب إضافة كلا القطبين!');
+                return false;
+            }
+            
+            if (!labState.hasSaltBridge) {
+                showToast('يجب إضافة الجسر الملحي!');
+                return false;
+            }
+            
+            if (!labState.hasWires) {
+                showToast('يجب إضافة الأسلاك!');
+                return false;
+            }
+            
+            if (!labState.isConnected) {
+                showToast('يجب توصيل الدائرة أولاً!');
+                return false;
+            }
+            
+            if (!labState.hasZincSolution) {
+                showToast('يجب إضافة محلول كبريتات الخارصين أولاً!');
+                return false;
+            }
+            
+            if (!labState.hasCopperSolution) {
+                showToast('يجب إضافة محلول كبريتات النحاس أولاً!');
+                return false;
+            }
+            
+            return true;
+        }
+
+        function initializeSimulationElements() {
+            particles = [];
+            electrons = [];
+            electrodeIons = [];
+            
+            const zincBeaker = labItems.find(item => item.type === 'zinc-beaker');
+            const copperBeaker = labItems.find(item => item.type === 'copper-beaker');
+            const zincElectrode = labItems.find(item => item.type === 'zinc-electrode');
+            const copperElectrode = labItems.find(item => item.type === 'copper-electrode');
+            
+            if (!zincBeaker || !copperBeaker || !zincElectrode || !copperElectrode) return;
+            
+            // Create electrode ions
+            for (let i = 0; i < 15; i++) {
+                // Zinc electrode -> Zn2+ ions moving down into the solution
+                electrodeIons.push({
+                    x: zincElectrode.x + zincElectrode.width / 2 + (Math.random() - 0.5) * 10,
+                    y: zincElectrode.y + zincElectrode.height - 20,
+                    vx: (Math.random() - 0.5) * 0.5,
+                    vy: 1 + Math.random() * 1,
+                    color: '#9E9E9E',
+                    symbol: 'Zn²⁺',
+                    size: 4 + Math.random() * 2,
+                    life: 0,
+                    maxLife: 4 + Math.random() * 2,
+                    electrode: 'zinc',
+                    type: 'ion'
+                });
+
+                // Electrons moving up the zinc electrode
+                electrodeIons.push({
+                    x: zincElectrode.x + zincElectrode.width / 2 + (Math.random() - 0.5) * 5,
+                    y: zincElectrode.y + zincElectrode.height,
+                    vx: (Math.random() - 0.5) * 0.2,
+                    vy: -1 - Math.random() * 1,
+                    color: '#00FFFF',
+                    symbol: 'e⁻',
+                    size: 3 + Math.random() * 1,
+                    life: 0,
+                    maxLife: 3 + Math.random() * 2,
+                    electrode: 'zinc',
+                    type: 'electron'
+                });
+                
+                // Electrons moving down the copper electrode
+                electrodeIons.push({
+                    x: copperElectrode.x + copperElectrode.width / 2 + (Math.random() - 0.5) * 5,
+                    y: copperElectrode.y,
+                    vx: (Math.random() - 0.5) * 0.2,
+                    vy: 1 + Math.random() * 1,
+                    color: '#00FFFF',
+                    symbol: 'e⁻',
+                    size: 3 + Math.random() * 1,
+                    life: 0,
+                    maxLife: 3 + Math.random() * 2,
+                    electrode: 'copper',
+                    type: 'electron'
+                });
+
+                // Copper ions moving towards the copper electrode
+                const copperBeaker = labItems.find(item => item.type === 'copper-beaker');
+                if (copperBeaker) {
+                    const solutionHeight = (copperBeaker.height - 40) * copperBeaker.solutionLevel / 100;
+                    const solutionTop = copperBeaker.y + copperBeaker.height - 15 - solutionHeight;
+                    electrodeIons.push({
+                        x: copperBeaker.x + copperBeaker.width / 2 + (Math.random() - 0.5) * (copperBeaker.width - 40),
+                        y: solutionTop + Math.random() * solutionHeight,
+                        vx: (copperElectrode.x + copperElectrode.width / 2 - (copperBeaker.x + copperBeaker.width / 2)) / 100,
+                        vy: (copperElectrode.y + copperElectrode.height - (solutionTop + solutionHeight / 2)) / 100,
+                        color: '#FF6B35',
+                        symbol: 'Cu²⁺',
+                        size: 4 + Math.random() * 2,
+                        life: 0,
+                        maxLife: 5 + Math.random() * 3,
+                        electrode: 'copper',
+                        type: 'ion_attraction'
+                    });
+                }
+            }
+        }
+
+        function animate() {
+            if (!isSimulationRunning) return;
+            
+            ionAnimationTime += 0.02 * ionSpeed;
+            
+            // Update electrode ions and electrons
+            electrodeIons.forEach((particle, index) => {
+                particle.x += particle.vx * (ionSpeed / 5);
+                particle.y += particle.vy * (ionSpeed / 3);
+                particle.life += 0.01 * ionSpeed;
+                
+                // Handle different particle types
+                if (particle.type === 'ion') {
+                    // Zinc ions moving down into solution
+                    if (particle.electrode === 'zinc') {
+                        const zincBeaker = labItems.find(item => item.type === 'zinc-beaker');
+                        const zincElectrode = labItems.find(item => item.type === 'zinc-electrode');
+                        
+                        if (zincBeaker && zincElectrode) {
+                            const solutionHeight = (zincBeaker.height - 40) * zincBeaker.solutionLevel / 100;
+                            const solutionBottom = zincBeaker.y + zincBeaker.height - 15;
+                            
+                            // Reset when reaching solution or life exceeded
+                            if (particle.y > solutionBottom - solutionHeight || particle.life > particle.maxLife) {
+                                particle.x = zincElectrode.x + zincElectrode.width / 2 + (Math.random() - 0.5) * 10;
+                                particle.y = zincElectrode.y + zincElectrode.height - 20;
+                                particle.life = 0;
+                                particle.vx = (Math.random() - 0.5) * 0.5;
+                                particle.vy = 1 + Math.random() * 1;
+                            }
+                            
+                            // Keep within beaker bounds
+                            if (particle.x < zincBeaker.x + 5) particle.x = zincBeaker.x + 5;
+                            if (particle.x > zincBeaker.x + zincBeaker.width - 5) particle.x = zincBeaker.x + zincBeaker.width - 5;
+                        }
+                    }
+                } else if (particle.type === 'electron') {
+                    // Electrons moving on electrodes
+                    if (particle.electrode === 'zinc') {
+                        const zincElectrode = labItems.find(item => item.type === 'zinc-electrode');
+                        if (zincElectrode && (particle.y < zincElectrode.y || particle.life > particle.maxLife)) {
+                            particle.x = zincElectrode.x + zincElectrode.width / 2 + (Math.random() - 0.5) * 5;
+                            particle.y = zincElectrode.y + zincElectrode.height;
+                            particle.life = 0;
+                            particle.vx = (Math.random() - 0.5) * 0.2;
+                            particle.vy = -1 - Math.random() * 1;
+                        }
+                    } else if (particle.electrode === 'copper') {
+                        const copperElectrode = labItems.find(item => item.type === 'copper-electrode');
+                        if (copperElectrode && (particle.y > copperElectrode.y + copperElectrode.height || particle.life > particle.maxLife)) {
+                            particle.x = copperElectrode.x + copperElectrode.width / 2 + (Math.random() - 0.5) * 5;
+                            particle.y = copperElectrode.y;
+                            particle.life = 0;
+                            particle.vx = (Math.random() - 0.5) * 0.2;
+                            particle.vy = 1 + Math.random() * 1;
+                        }
+                    }
+                } else if (particle.type === 'ion_attraction') {
+                    // Copper ions moving towards electrode
+                    const copperElectrode = labItems.find(item => item.type === 'copper-electrode');
+                    const copperBeaker = labItems.find(item => item.type === 'copper-beaker');
+                    
+                    if (copperElectrode && copperBeaker) {
+                        const electrodeBottom = copperElectrode.y + copperElectrode.height;
+                        
+                        // Reset when reaching electrode or life exceeded
+                        if (particle.y > electrodeBottom - 10 || particle.life > particle.maxLife) {
+                            const solutionHeight = (copperBeaker.height - 40) * copperBeaker.solutionLevel / 100;
+                            const solutionTop = copperBeaker.y + copperBeaker.height - 15 - solutionHeight;
+                            particle.x = copperBeaker.x + copperBeaker.width / 2 + (Math.random() - 0.5) * (copperBeaker.width - 40);
+                            particle.y = solutionTop + Math.random() * solutionHeight;
+                            particle.life = 0;
+                            particle.vx = (copperElectrode.x + copperElectrode.width / 2 - particle.x) / 100;
+                            particle.vy = (electrodeBottom - particle.y) / 100;
+                        }
+                    }
+                }
+            });
+            
+            // After 4 seconds, add salt bridge ion movement
+            if (ionAnimationTime > 4) {
+                updateSaltBridgeIons();
+            }
+            
+            redrawCanvas();
+            animationId = requestAnimationFrame(animate);
+        }
+        
+        function updateSaltBridgeIons() {
+            // This function will handle the salt bridge ion movement after 4 seconds
+            // The ions will be drawn in the drawSaltBridge function
+        }
+
+        function redrawCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw background grid
+            drawGrid();
+            
+            // Draw connections
+            drawConnections();
+            
+            // Draw lab items
+            labItems.forEach(item => drawLabItem(item));
+            
+            // Draw connection points
+            drawConnectionPoints();
+            
+            // Draw simulation elements
+            if (isSimulationRunning) {
+                drawElectrodeIons();
+            }
+            
+            // Draw enhanced features
+            drawEnhancedFeatures();
+        }
+
+        function drawGrid() {
+            ctx.strokeStyle = 'rgba(0, 0, 0, 0.1)';
+            ctx.lineWidth = 1;
+            
+            for (let x = 0; x < canvas.width; x += 50) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvas.height);
+                ctx.stroke();
+            }
+            
+            for (let y = 0; y < canvas.height; y += 50) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+            }
+        }
+
+        function drawConnections() {
+            ctx.strokeStyle = '#FFD700';
+            ctx.lineWidth = 4;
+            ctx.lineCap = 'round';
+            
+            connections.forEach(connection => {
+                ctx.beginPath();
+                ctx.moveTo(connection.from.x, connection.from.y);
+                ctx.lineTo(connection.to.x, connection.to.y);
+                ctx.stroke();
+                
+                // Draw flowing electrons during simulation
+                if (isSimulationRunning) {
+                    drawFlowingElectrons(connection);
+                }
+            });
+        }
+
+        function drawConnectionPoints() {
+            connectionPoints.forEach(point => {
+                ctx.fillStyle = point.selected ? '#FF0000' : '#FFD700';
+                ctx.strokeStyle = '#333';
+                ctx.lineWidth = 2;
+                
+                ctx.beginPath();
+                ctx.arc(point.x, point.y, 8, 0, 2 * Math.PI);
+                ctx.fill();
+                ctx.stroke();
+                
+                if (point.selected) {
+                    ctx.beginPath();
+                    ctx.arc(point.x, point.y, 12, 0, 2 * Math.PI);
+                    ctx.strokeStyle = '#FF0000';
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                }
+            });
+        }
+
+        function drawFlowingElectrons(connection) {
+            const time = Date.now() * 0.005 * ionSpeed;
+            const numElectrons = 3;
+            
+            for (let i = 0; i < numElectrons; i++) {
+                const progress = (time + i * 0.3) % 1;
+                const x = connection.from.x + (connection.to.x - connection.from.x) * progress;
+                const y = connection.from.y + (connection.to.y - connection.from.y) * progress;
+                
+                ctx.fillStyle = '#00FFFF';
+                ctx.beginPath();
+                ctx.arc(x, y, 10, 0, 2 * Math.PI);
+                ctx.fill();
+                
+                // Add enhanced glow effect
+                ctx.shadowColor = '#00FFFF';
+                ctx.shadowBlur = 15;
+                ctx.beginPath();
+                ctx.arc(x, y, 10, 0, 2 * Math.PI);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+        }
+
+        function drawLabItem(item) {
+            ctx.save();
+            
+            switch (item.type) {
+                case 'zinc-beaker':
+                case 'copper-beaker':
+                    drawBeaker(item);
+                    break;
+                case 'bulb':
+                    drawBulb(item);
+                    break;
+                case 'zinc-electrode':
+                case 'copper-electrode':
+                    drawElectrode(item);
+                    break;
+                case 'salt-bridge':
+                    drawSaltBridge(item);
+                    break;
+                case 'wire':
+                    drawWire(item);
+                    break;
+            }
+            
+            ctx.restore();
+        }
+
+        function drawBeaker(item) {
+    // إعداد خصائص الإناء
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 3;
+    ctx.fillStyle = item.color;
+
+    // إذا كانت هناك طبقة نحاس إضافية (ترسيب)
+    if (item.type === 'copper-electrode' && item.extraLayer) {
+        item.extraLayer.forEach(layer => {
+            ctx.beginPath();
+            ctx.fillStyle = '#CD7F32';
+            ctx.arc(layer.x, layer.y, layer.size, 0, 2 * Math.PI);
+            ctx.fill();
+        });
+    }
+
+    // رسم جسم الإناء
+    ctx.beginPath();
+    ctx.rect(item.x, item.y + 20, item.width, item.height - 20);
+    ctx.fill();
+    ctx.stroke();
+
+    // رسم حافة الإناء العلوية
+    ctx.beginPath();
+    ctx.rect(item.x - 5, item.y + 15, item.width + 10, 10);
+    ctx.fill();
+    ctx.stroke();
+
+    // رسم المحلول إن وُجد
+    if (item.hasSolution) {
+        const solutionHeight = (item.height - 40) * item.solutionLevel / 100;
+        ctx.fillStyle = item.solutionColor;
+        ctx.fillRect(item.x + 5, item.y + item.height - 15 - solutionHeight, item.width - 10, solutionHeight);
+
+        // تموج السطح إذا كانت المحاكاة نشطة
+        if (isSimulationRunning) {
+            const time = Date.now() * 0.003 * ionSpeed;
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            for (let x = item.x + 5; x < item.x + item.width - 5; x += 3) {
+                const y = item.y + item.height - 15 - solutionHeight + Math.sin(time + x * 0.1) * 3;
+                if (x === item.x + 5) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            }
+            ctx.stroke();
+        }
+
+        // رسم الصيغة الكيميائية داخل الإناء
+        ctx.fillStyle = '#000';
+        ctx.font = 'bold 16px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(item.solutionSymbol, item.x + item.width / 2, item.y + 50);
+
+        // رسم الأيونات إذا كانت المحاكاة نشطة
+        if (isSimulationRunning) {
+            drawBeakerIons(item);
+        }
+    }
+
+    // ✅ تسميات أسفل الإناء
+    ctx.fillStyle = '#FFF';
+    ctx.font = 'bold 12px Arial';
+    ctx.textAlign = 'center';
+
+    const label = item.type === 'zinc-beaker' ? 'نصف خلية الخارصين' : 'نصف خلية النحاس';
+    const process = item.type === 'zinc-beaker' ? 'عملية أكسدة' : 'عملية اختزال';
+    const equation = item.type === 'zinc-beaker' ? 'Zn → Zn²⁺ + 2e⁻' : 'Cu²⁺ + 2e⁻ → Cu';
+
+    const baseY = item.y + item.height + 20;
+    ctx.fillText(label, item.x + item.width / 2, baseY);
+    ctx.fillText(process, item.x + item.width / 2, baseY + 20);
+    ctx.fillText(equation, item.x + item.width / 2, baseY + 40);
+}
+
+        function drawBeakerIons(beaker) {
+    if (beaker.visibleIons) {
+        beaker.visibleIons.forEach(ion => {
+            ion.x += ion.dx;
+            ion.y += ion.dy;
+
+            const left = beaker.x + 20;
+            const right = beaker.x + beaker.width - 20;
+            const top = beaker.y + 80;
+            const bottom = beaker.y + beaker.height - 40;
+
+            if (ion.x < left || ion.x > right) ion.dx *= -1;
+            if (ion.y < top || ion.y > bottom) ion.dy *= -1;
+
+            ctx.beginPath();
+            ctx.fillStyle = ion.color;
+            ctx.arc(ion.x, ion.y, 10, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.fillStyle = '#000';
+            ctx.font = 'bold 8px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(ion.symbol, ion.x, ion.y + 3);
+        });
+    }
+
+    const time = Date.now() * 0.002;
+    const solutionAmount = 40;
+    const solutionTop = beaker.y + 30;
+    const solutionBottom = beaker.y + beaker.height - 10;
+    const solutionLeft = beaker.x + 10;
+    const solutionRight = beaker.x + beaker.width - 10;
+
+    if (beaker.type === 'zinc-beaker') {
+        // أيونات Zn²⁺ الأساسية
+        const baseZnIons = Math.floor(solutionAmount / 4);
+        const additionalZnIons = Math.floor(ionAnimationTime * 1.5);
+        const totalZnIons = baseZnIons + additionalZnIons;
+
+        for (let i = 0; i < totalZnIons; i++) {
+            const x = solutionLeft + (i % 8) * 20 + Math.sin(time + i) * 2;
+            const y = solutionTop + Math.floor(i / 8) * 12 + Math.cos(time + i) * 1;
+            if (y > solutionBottom - 10) continue;
+
+            ctx.beginPath();
+            ctx.fillStyle = '#9E9E9E';
+            ctx.arc(x, y, 10, 0, 2 * Math.PI);
+            ctx.fill();
+
+            ctx.fillStyle = '#FFF';
+            ctx.font = 'bold 8px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('Zn²⁺', x, y + 3);
+        }
+
+        // أيونات SO₄²⁻ الأساسية
+        const baseSo4 = Math.floor(solutionAmount / 6);
+        for (let i = 0; i < baseSo4; i++) {
+            const x = solutionLeft + (i % 8) * 20 + Math.cos(time + i) * 2;
+            const y = solutionTop + Math.floor(i / 8) * 12 + Math.sin(time + i) * 1;
+            ctx.beginPath();
+            ctx.fillStyle = '#FFD700';
+            ctx.arc(x, y, 10, 0, 2 * Math.PI);
+            ctx.fill();
+
+            ctx.fillStyle = '#000';
+            ctx.font = 'bold 7px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('SO₄²⁻', x, y + 2);
+        }
+
+        // ❗️أيونات SO₄²⁻ الجديدة (تظهر بعد 8 ثوانٍ تدريجياً)
+        if (ionAnimationTime >= 8) {
+            const newSo4 = Math.min(Math.floor((ionAnimationTime - 8) * 3), 20);
+            for (let i = 0; i < newSo4; i++) {
+                const x = solutionLeft + (i % 6) * 20 + Math.cos(time + i) * 1.5;
+                const y = solutionBottom - 20 - (i * 6 % 60);
+                ctx.beginPath();
+                ctx.fillStyle = '#FFD700';
+                ctx.arc(x, y, 10, 0, 2 * Math.PI);
+                ctx.fill();
+
+                ctx.fillStyle = '#000';
+                ctx.font = 'bold 7px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('SO₄²⁻', x, y + 2);
+            }
+        }
+    }
+
+    else if (beaker.type === 'copper-beaker') {
+        const baseCuIons = Math.floor(solutionAmount / 4);
+        const reducedCuIons = Math.max(0, baseCuIons - Math.floor(ionAnimationTime * 1.2));
+        const baseSo4Ions = Math.floor(solutionAmount / 6);
+        const additionalSo4Ions = Math.floor(ionAnimationTime * 1.2);
+        const totalSo4Ions = baseSo4Ions + additionalSo4Ions;
+
+        for (let i = 0; i < reducedCuIons; i++) {
+            const gridX = i % 8;
+            const gridY = Math.floor(i / 8);
+            const baseX = solutionLeft + 10 + gridX * (beaker.width - 30) / 8;
+            const baseY = solutionTop + 10 + gridY * 12;
+            if (baseY > solutionBottom - 10) continue;
+
+            let x = baseX + Math.sin(time + i * 0.1) * 2;
+            let y = baseY + Math.cos(time + i * 0.1) * 2;
+
+            const ionSize = 5 + Math.sin(time * 2 + i) * 0.5;
+
+            ctx.fillStyle = '#FF5722';
+            ctx.shadowColor = '#FF5722';
+            ctx.shadowBlur = 6;
+            ctx.beginPath();
+            ctx.arc(x, y, ionSize, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 8px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('Cu²⁺', x, y + 2);
+        }
+
+        for (let i = 0; i < totalSo4Ions; i++) {
+            const gridX = (i + reducedCuIons) % 8;
+            const gridY = Math.floor((i + reducedCuIons) / 8);
+            const baseX = solutionLeft + 10 + gridX * (beaker.width - 30) / 8;
+            const baseY = solutionTop + 10 + gridY * 12;
+            if (baseY > solutionBottom - 10) continue;
+
+            let x = baseX + Math.sin(time + i * 0.4) * 2;
+            let y = baseY + Math.cos(time + i * 0.4) * 1;
+
+            ctx.beginPath();
+            ctx.fillStyle = '#FFD54F';
+            ctx.shadowColor = '#FFD54F';
+            ctx.shadowBlur = 5;
+            ctx.arc(x, y, 10, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            ctx.fillStyle = '#000';
+            ctx.font = 'bold 7px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('SO₄²⁻', x, y + 2);
+        }
+
+        // ❗️أيونات K⁺ الجديدة تظهر تدريجياً بعد 8 ثوانٍ
+        if (ionAnimationTime >= 8) {
+    const newK = Math.min(Math.floor((ionAnimationTime - 8) * 5), 40);
+    for (let i = 0; i < newK; i++) {
+        const x = solutionRight - 30 - (i % 4) * 20 + Math.sin(time + i) * 1.5;
+        const y = solutionTop + 40 + (i * 5 % 60);
+        ctx.beginPath();
+        ctx.fillStyle = '#4CAF50';
+        ctx.arc(x, y, 9, 0, 2 * Math.PI);
+        ctx.fill();
+
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 7px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('K⁺', x, y + 2);
+    }
+}
+
+    }
+}
+        function drawElectrodeIons() {
+            electrodeIons.forEach(ion => {
+                ctx.shadowColor = ion.color;
+                ctx.shadowBlur = 10 + Math.sin(ionAnimationTime * 5 + ion.phase) * 3;
+                
+                ctx.fillStyle = ion.color;
+                ctx.beginPath();
+                ctx.arc(ion.x, ion.y, ion.size, 0, 2 * Math.PI);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+                
+                ctx.fillStyle = '#FFF';
+                ctx.font = 'bold 10px Arial';
+                ctx.textAlign = 'center';
+                ctx.strokeStyle = '#000';
+                ctx.lineWidth = 1;
+                ctx.strokeText(ion.symbol, ion.x, ion.y + 2);
+                ctx.fillText(ion.symbol, ion.x, ion.y + 2);
+                
+                // Add trail effect
+                ctx.strokeStyle = ion.color;
+                ctx.lineWidth = 2;
+                ctx.globalAlpha = 0.3;
+                ctx.beginPath();
+                ctx.moveTo(ion.x, ion.y);
+                ctx.lineTo(ion.x - ion.vx * 1.5, ion.y - ion.vy * 1.5);
+                ctx.stroke();
+                ctx.globalAlpha = 1;
+            });
+        }
+
+        function drawBulb(item) {
+            // Draw bulb base
+            ctx.fillStyle = '#666';
+            ctx.fillRect(item.x + item.width/4, item.y + item.height - 15, item.width/2, 15);
+            
+            // Draw connection terminals
+            ctx.fillStyle = '#FFD700';
+            ctx.fillRect(item.x + item.width/4 - 2, item.y + item.height - 5, 8, 8);
+            ctx.fillRect(item.x + 3*item.width/4 - 2, item.y + item.height - 5, 8, 8);
+            
+            // Draw + and - symbols
+            ctx.fillStyle = '#000';
+            ctx.font = 'bold 10px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('+', item.x + item.width/4, item.y + item.height + 10);
+            ctx.fillText('-', item.x + 3*item.width/4, item.y + item.height + 10);
+            
+            // Draw bulb
+            ctx.fillStyle = item.isOn ? '#FFFF00' : item.color;
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 2;
+            
+            ctx.beginPath();
+            ctx.arc(item.x + item.width/2, item.y + item.height/2 - 5, item.width/2 - 5, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.stroke();
+            
+            // Add glow effect when on
+            if (item.isOn) {
+                ctx.shadowColor = '#FFFF00';
+                ctx.shadowBlur = 30;
+                ctx.beginPath();
+                ctx.arc(item.x + item.width/2, item.y + item.height/2 - 5, item.width/2 - 5, 0, 2 * Math.PI);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+                
+                // Add animated light rays
+                ctx.strokeStyle = 'rgba(255, 255, 0, 0.4)';
+                ctx.lineWidth = 4;
+                const time = Date.now() * 0.01;
+                for (let i = 0; i < 12; i++) {
+                    const angle = (i * Math.PI * 2) / 12 + time;
+                    const rayLength = 20 + Math.sin(time + i) * 10;
+                    const startX = item.x + item.width/2 + Math.cos(angle) * (item.width/2 - 5);
+                    const startY = item.y + item.height/2 - 5 + Math.sin(angle) * (item.width/2 - 5);
+                    const endX = item.x + item.width/2 + Math.cos(angle) * (item.width/2 + rayLength);
+                    const endY = item.y + item.height/2 - 5 + Math.sin(angle) * (item.width/2 + rayLength);
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(startX, startY);
+                    ctx.lineTo(endX, endY);
+                    ctx.stroke();
+                }
+            }
+            
+            // Label
+            ctx.fillStyle = '#333';
+            ctx.font = 'bold 12px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('مصباح', item.x + item.width/2, item.y - 5);
+        }
+
+        function drawElectrode(item) {
+    // لون القطب الأساسي
+    ctx.fillStyle = item.type === 'zinc-electrode' ? '#B0BEC5' : '#B87333';
+    ctx.fillRect(item.x, item.y, item.width, item.height);
+
+    // رمز العنصر والإشارة
+    const label = item.type === 'zinc-electrode' ? 'Zn' : 'cu';
+    const charge = item.type === 'zinc-electrode' ? '-' : '+';
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 12px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText(`${label} (${charge})`, item.x + item.width / 2, item.y - 8);
+
+    // تآكل قطب الخارصين من الأسفل تدريجيًا
+    if (item.type === 'zinc-electrode') {
+        const erosionHeight = Math.min(ionAnimationTime * 1.5, item.height / 2);
+        ctx.fillStyle = '#e0e0e0';
+        ctx.fillRect(item.x, item.y + item.height - erosionHeight, item.width, erosionHeight);
+    }
+
+    // ترسيب النحاس على قطب النحاس تدريجيًا من الأعلى
+    if (item.type === 'copper-electrode') {
+        const depositHeight = Math.min(ionAnimationTime * 1.5, item.height / 2);
+        ctx.fillStyle = 'rgba(255, 87, 34, 0.5)';
+        ctx.fillRect(item.x, item.y, item.width, depositHeight);
+    }
+}
+        function drawSaltBridge(item) {
+    const centerX = item.x + item.width / 2;
+    const bridgeWidth = 300;
+    const bridgeHeight = 30;
+    const bridgeThickness = 30;
+
+    const leftX = centerX - bridgeWidth / 2;
+    const rightX = centerX + bridgeWidth / 2;
+    const topY = item.y - 10;
+    const bottomY = item.y + item.height / 2;
+
+    // الجدران العمودية للجسر
+    ctx.beginPath();
+    ctx.strokeStyle = 'rgba(33, 150, 243, 0.6)';
+    ctx.lineWidth = bridgeThickness;
+    ctx.lineCap = 'round';
+    ctx.moveTo(leftX, topY);
+    ctx.lineTo(leftX, bottomY);
+    ctx.moveTo(rightX, topY);
+    ctx.lineTo(rightX, bottomY);
+    ctx.stroke();
+
+    // الوصلة الأفقية
+    ctx.beginPath();
+    ctx.moveTo(leftX, topY);
+    ctx.lineTo(rightX, topY);
+    ctx.stroke();
+
+    const time = Date.now() * 0.003;
+    const numIons = 6;
+    const ionFallSpeed = 2; // سرعة السقوط للأيونات
+
+    // K⁺ تتحرك من اليمين إلى اليسار (تم استبدالها بـ SO₄²⁻ هنا)
+    for (let i = 0; i < numIons; i++) {
+        const progress = ((time + i * 20) % 100) / 100;
+        const x = rightX - progress * bridgeWidth;
+        const y = topY - bridgeThickness / 2;
+
+        // إضافة الحركة العمودية بعد الوصول للنهاية
+        const fallProgress = (progress >= 1) ? ((progress - 1) * ionFallSpeed) : 0;
+        const finalY = y + fallProgress * 50; // 50 هي المسافة التي ستسقط بها الأيونات
+
+        ctx.beginPath();
+        ctx.fillStyle = 'rgba(33, 150, 243, 1)'; // لون ثابت لـ SO₄²⁻
+        ctx.arc(x, finalY, 9, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.fillStyle = 'rgba(255, 255, 255, 1)'; // لون النص
+        ctx.font = 'bold 12px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('SO₄²⁻', x, finalY + 4);
+        drawArrow(x, finalY - 10, -1.5, 0, '#2196F3');
+    }
+
+    // SO₄²⁻ تتحرك من اليسار إلى اليمين (تم استبدالها بـ K⁺ هنا)
+    for (let i = 0; i < numIons; i++) {
+        const progress = ((time + i * 20) % 100) / 100;
+        const x = leftX + progress * bridgeWidth;
+        const y = topY + bridgeThickness / 2;
+
+        // إضافة الحركة العمودية بعد الوصول للنهاية
+        const fallProgress = (progress >= 1) ? ((progress - 1) * ionFallSpeed) : 0;
+        const finalY = y - fallProgress * 50; // الحركة من أعلى إلى أسفل
+
+        ctx.beginPath();
+        ctx.fillStyle = 'rgba(76, 175, 80, 1)'; // لون ثابت لـ K⁺
+        ctx.arc(x, finalY, 7, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.fillStyle = 'rgba(255, 255, 255, 1)'; // لون النص
+        ctx.font = 'bold 11px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('K⁺', x, finalY + 4);
+        drawArrow(x, finalY - 10, 1.5, 0, '#4CAF50');
+    }
+
+    // إضافة الأيونات في العمودين
+    for (let i = 0; i < numIons; i++) {
+        const progress = ((time + i * 20 + 50) % 100) / 100; // تغيير توقيت الأيونات
+        const x1 = leftX;
+        const finalY1 = topY + (progress * (bottomY - topY)); // حركة عمودية لـ SO₄²⁻ من أعلى إلى أسفل
+        
+        ctx.beginPath();
+        ctx.fillStyle = 'rgba(33, 150, 243, 1)'; // لون ثابت لـ SO₄²⁻
+        ctx.arc(x1, finalY1, 9, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.fillStyle = 'rgba(255, 255, 255, 1)'; // لون النص
+        ctx.font = 'bold 12px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('SO₄²⁻', x1, finalY1 + 4);
+        drawArrow(x1, finalY1 - 10, 0, 1.5, '#2196F3');
+
+        const x2 = rightX;
+        const finalY2 = topY + (progress * (bottomY - topY)); // حركة عمودية لـ K⁺ من أعلى إلى أسفل
+        
+        ctx.beginPath();
+        ctx.fillStyle = 'rgba(76, 175, 80, 1)'; // لون ثابت لـ K⁺
+        ctx.arc(x2, finalY2, 7, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.fillStyle = 'rgba(255, 255, 255, 1)'; // لون النص
+        ctx.font = 'bold 11px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('K⁺', x2, finalY2 + 4);
+        drawArrow(x2, finalY2 - 10, 0, 1.5, '#4CAF50');
+    }
+
+    // التسمية
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 13px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('الجسر الملحي (K₂SO₄)', centerX, bottomY + 25);
+}
+function drawArrow(x, y, dx, dy, color = '#000') {
+    const length = Math.sqrt(dx * dx + dy * dy);
+    if (length === 0) return;
+
+    const unitX = dx / length;
+    const unitY = dy / length;
+
+    const arrowLength = 6;
+    const arrowWidth = 3;
+
+    ctx.beginPath();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1.5;
+    ctx.moveTo(x, y);
+    ctx.lineTo(x + dx, y + dy);
+    ctx.stroke();
+
+    // رأس السهم
+    ctx.beginPath();
+    ctx.moveTo(x + dx, y + dy);
+    ctx.lineTo(
+        x + dx - arrowLength * unitX - arrowWidth * unitY,
+        y + dy - arrowLength * unitY + arrowWidth * unitX
+    );
+    ctx.lineTo(
+        x + dx - arrowLength * unitX + arrowWidth * unitY,
+        y + dy - arrowLength * unitY - arrowWidth * unitX
+    );
+    ctx.closePath();
+    ctx.fillStyle = color;
+    ctx.fill();
+}
+        function drawWire(item) {
+            ctx.strokeStyle = item.color;
+            ctx.lineWidth = 8;
+            ctx.lineCap = 'round';
+            
+            if (item.orientation === 'horizontal') {
+                ctx.beginPath();
+                ctx.moveTo(item.x, item.y + item.height/2);
+                ctx.lineTo(item.x + item.width, item.y + item.height/2);
+                ctx.stroke();
+            } else {
+                ctx.beginPath();
+                ctx.moveTo(item.x + item.width/2, item.y);
+                ctx.lineTo(item.x + item.width/2, item.y + item.height);
+                ctx.stroke();
+            }
+            
+            // Label
+            ctx.fillStyle = '#333';
+            ctx.font = 'bold 10px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('سلك', item.x + item.width/2, item.y - 5);
+        }
+
+        function showReactionDetails() {
+            const modal = document.getElementById('reaction-details-modal');
+            const atomicDisplay = document.getElementById('atomic-display');
+            const chemicalEquations = document.getElementById('chemical-equations');
+            
+            // Clear previous content
+            atomicDisplay.innerHTML = '';
+            chemicalEquations.innerHTML = '';
+            
+            // Create atomic visualization
+            createAtomicVisualization(atomicDisplay);
+            
+            // Add chemical equations
+            createChemicalEquations(chemicalEquations);
+            
+            modal.style.display = 'block';
+        }
+
+        function createAtomicVisualization(container) {
+            container.innerHTML = `
+                <div style="position: relative; height: 200px; background: radial-gradient(circle, #001122, #000000);">
+                    <div class="atom" style="width: 50px; height: 50px; background: #9E9E9E; left: 40px; top: 75px;">Zn</div>
+                    <div class="atom" style="width: 50px; height: 50px; background: #FF6B35; left: 150px; top: 75px;">Cu</div>
+                    <div class="electron-orbit" style="width: 90px; height: 90px; left: 25px; top: 55px;"></div>
+                    <div class="electron-orbit" style="width: 90px; height: 90px; left: 135px; top: 55px;"></div>
+                    <div class="electron" style="left: 70px; top: 100px;"></div>
+                    <div class="electron" style="left: 180px; top: 100px;"></div>
+                </div>
+            `;
+        }
+
+        function createChemicalEquations(container) {
+            container.innerHTML = `
+                <h5 style="color: #333; margin: 15px 0;">المعادلات الكيميائية للخلية الجلفانية:</h5>
+                <div style="background: #f0f8ff; padding: 15px; border-radius: 10px; margin: 10px 0;">
+                    <p><strong>الأكسدة عند المصعد (الخارصين):</strong></p>
+                    <p style="font-size: 18px; text-align: center; color: #9E9E9E;">Zn → Zn²⁺ + 2e⁻</p>
+                </div>
+                <div style="background: #fff0f5; padding: 15px; border-radius: 10px; margin: 10px 0;">
+                    <p><strong>الاختزال عند المهبط (النحاس):</strong></p>
+                    <p style="font-size: 18px; text-align: center; color: #FF6B35;">Cu²⁺ + 2e⁻ → Cu</p>
+                </div>
+                <div style="background: #f0fff0; padding: 15px; border-radius: 10px; margin: 10px 0;">
+                    <p><strong>التفاعل الكلي:</strong></p>
+                    <p style="font-size: 18px; text-align: center; color: #4CAF50;">Zn + Cu²⁺ → Zn²⁺ + Cu</p>
+                </div>
+                <div style="background: #fffacd; padding: 15px; border-radius: 10px; margin: 10px 0;">
+                    <p><strong>ملاحظات:</strong></p>
+                    <p>• تدفق الإلكترونات من الخارصين إلى النحاس</p>
+                    <p>• الجسر الملحي يحافظ على التوازن الكهربائي</p>
+                    <p>• سرعة حركة الأيونات: ${document.getElementById('speed-display').textContent}</p>
+                    <p>• كمية المحلول: ${solutionAmount}%</p>
+                </div>
+            `;
+        }
+
+        function closeReactionDetails() {
+            document.getElementById('reaction-details-modal').style.display = 'none';
+        }
+
+        function showConclusion() {
+            const modal = document.getElementById('conclusion-modal');
+            const content = document.getElementById('conclusion-content');
+            
+            const conclusionText = `
+                <p><strong>نتائج تجربة الخلية الجلفانية:</strong></p>
+                <p>• في نصف خلية الخارصين، يحدث تأكسد: Zn → Zn²⁺ + 2e⁻</p>
+                <p>• في نصف خلية النحاس، يحدث اختزال: Cu²⁺ + 2e⁻ → Cu</p>
+                <p>• الإلكترونات تتدفق من الخارصين (المصعد) إلى النحاس (المهبط)</p>
+                <p>• الجسر الملحي يسمح بحركة الأيونات للحفاظ على التوازن الكهربائي</p>
+                <p>• تدفق الإلكترونات ينتج تياراً كهربائياً يضيء المصباح</p>
+                <p>• هذا يثبت تحويل الطاقة الكيميائية إلى طاقة كهربائية</p>
+                <p>• كمية المحلول المستخدمة: ${solutionAmount}%</p>
+                <p>• سرعة حركة الأيونات: ${document.getElementById('speed-display').textContent}</p>
+                <p><strong>الخلاصة:</strong> الخلية الجلفانية تحول الطاقة الكيميائية إلى طاقة كهربائية من خلال تفاعلات الأكسدة والاختزال.</p>
+            `;
+            
+            content.innerHTML = conclusionText;
+            modal.style.display = 'block';
+        }
+
+        function closeConclusion() {
+            document.getElementById('conclusion-modal').style.display = 'none';
+        }
+
+        function resetLab() {
+            labItems = [];
+            particles = [];
+            electrons = [];
+            electrodeIons = [];
+            connections = [];
+            connectionPoints = [];
+            selectedConnectionPoint = null;
+            isSimulationRunning = false;
+            toolsLocked = false;
+            ionAnimationTime = 0;
+            solutionLevelAnimating = false;
+            selectedWire = null;
+            
+            labState = {
+                hasZincBeaker: false,
+                hasCopperBeaker: false,
+                hasBulb: false,
+                hasZincElectrode: false,
+                hasCopperElectrode: false,
+                hasSaltBridge: false,
+                hasWires: false,
+                isConnected: false,
+                hasZincSolution: false,
+                hasCopperSolution: false,
+                solutionType: 'znso4'
+            };
+            
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+                animationId = null;
+            }
+            
+            document.getElementById('solution-type').value = 'znso4';
+            document.getElementById('solution-amount').value = 50;
+            document.getElementById('amount-display').textContent = '50%';
+            document.getElementById('ion-speed').value = 5;
+            document.getElementById('speed-display').textContent = 'متوسط';
+            solutionAmount = 50;
+            ionSpeed = 5;
+            wireOrientation = 'horizontal';
+            
+            redrawCanvas();
+            showToast('تم إعادة تعيين المختبر');
+        }
+
+        function updateLabState(toolType, added) {
+            switch (toolType) {
+                case 'zinc-beaker':
+                    labState.hasZincBeaker = added;
+                    break;
+                case 'copper-beaker':
+                    labState.hasCopperBeaker = added;
+                    break;
+                case 'bulb':
+                    labState.hasBulb = added;
+                    break;
+                case 'zinc-electrode':
+                    labState.hasZincElectrode = added;
+                    break;
+                case 'copper-electrode':
+                    labState.hasCopperElectrode = added;
+                    break;
+                case 'salt-bridge':
+                    labState.hasSaltBridge = added;
+                    break;
+                case 'wire':
+                    labState.hasWires = added;
+                    break;
+            }
+        }
+
+        function getToolName(toolType) {
+            const names = {
+                'zinc-beaker': 'إناء نصف خلية الخارصين',
+                'copper-beaker': 'إناء نصف خلية النحاس',
+                'bulb': 'المصباح',
+                'zinc-electrode': 'قطب الخارصين',
+                'copper-electrode': 'قطب النحاس',
+                'salt-bridge': 'الجسر الملحي',
+                'wire': 'السلك'
+            };
+            return names[toolType] || toolType;
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Enhanced feature functions
+        function toggleVoltageDisplay() {
+            showVoltageDisplay = !showVoltageDisplay;
+            const btn = document.getElementById('toggle-voltage-display');
+            if (showVoltageDisplay) {
+                btn.textContent = 'إخفاء الجهد الكهربائي';
+                btn.style.background = 'linear-gradient(45deg, #4CAF50, #45a049)';
+                showToast('تم تفعيل عرض الجهد الكهربائي');
+            } else {
+                btn.textContent = 'عرض الجهد الكهربائي';
+                btn.style.background = 'linear-gradient(45deg, #E91E63, #C2185B)';
+                showToast('تم إلغاء عرض الجهد الكهربائي');
+            }
+            redrawCanvas();
+        }
+
+        function toggleElectronFlow() {
+            showElectronFlow = !showElectronFlow;
+            const btn = document.getElementById('toggle-electron-flow');
+            if (showElectronFlow) {
+                btn.textContent = 'إخفاء تدفق الإلكترونات';
+                btn.style.background = 'linear-gradient(45deg, #4CAF50, #45a049)';
+                showToast('تم تفعيل تتبع تدفق الإلكترونات');
+                initializeElectronFlowParticles();
+            } else {
+                btn.textContent = 'تتبع تدفق الإلكترونات';
+                btn.style.background = 'linear-gradient(45deg, #00BCD4, #0097A7)';
+                showToast('تم إلغاء تتبع تدفق الإلكترونات');
+                electronFlowParticles = [];
+            }
+        }
+
+        function toggleTemperatureEffect() {
+            temperatureEffect = !temperatureEffect;
+            const btn = document.getElementById('toggle-temperature-effect');
+            if (temperatureEffect) {
+                btn.textContent = 'إلغاء تأثير درجة الحرارة';
+                btn.style.background = 'linear-gradient(45deg, #4CAF50, #45a049)';
+                temperature = 50; // Increase temperature
+                reactionRate = 1.5; // Faster reaction at higher temperature
+                showToast('تم تفعيل تأثير درجة الحرارة (50°C)');
+            } else {
+                btn.textContent = 'تأثير درجة الحرارة';
+                btn.style.background = 'linear-gradient(45deg, #FF5722, #E64A19)';
+                temperature = 25; // Normal temperature
+                reactionRate = 1.0; // Normal reaction rate
+                showToast('تم إلغاء تأثير درجة الحرارة (25°C)');
+            }
+            updateVoltageFromConditions();
+        }
+
+        function toggleConcentrationEffect() {
+            concentrationEffect = !concentrationEffect;
+            const btn = document.getElementById('toggle-concentration-effect');
+            if (concentrationEffect) {
+                btn.textContent = 'إلغاء تأثير التركيز';
+                btn.style.background = 'linear-gradient(45deg, #4CAF50, #45a049)';
+                concentrationZn = 2.0; // Higher concentration
+                concentrationCu = 0.5; // Lower concentration
+                showToast('تم تفعيل تأثير التركيز (Zn: 2M, Cu: 0.5M)');
+            } else {
+                btn.textContent = 'تأثير التركيز';
+                btn.style.background = 'linear-gradient(45deg, #795548, #5D4037)';
+                concentrationZn = 1.0; // Standard concentration
+                concentrationCu = 1.0; // Standard concentration
+                showToast('تم إلغاء تأثير التركيز (تركيز قياسي)');
+            }
+            updateVoltageFromConditions();
+        }
+
+        function showEnergyDiagram() {
+            const modal = document.getElementById('reaction-details-modal');
+            const content = document.getElementById('reaction-details-content');
+            
+            content.innerHTML = `
+                <h5 style="color: #333; margin: 15px 0;">مخطط الطاقة للخلية الجلفانية:</h5>
+                <div style="background: #000; border-radius: 10px; padding: 20px; margin: 15px 0; position: relative; height: 300px;">
+                    <canvas id="energy-diagram-canvas" width="350" height="260" style="border: 1px solid #333;"></canvas>
+                </div>
+                <div style="background: #f0f8ff; padding: 15px; border-radius: 10px; margin: 10px 0;">
+                    <p><strong>شرح مخطط الطاقة:</strong></p>
+                    <p>• المستوى الأعلى: طاقة الخارصين (أعلى طاقة)</p>
+                    <p>• المستوى الأسفل: طاقة النحاس (أقل طاقة)</p>
+                    <p>• الفرق في الطاقة = الجهد الكهربائي للخلية</p>
+                    <p>• الجهد الحالي: ${currentVoltage.toFixed(2)} فولت</p>
+                    <p>• درجة الحرارة: ${temperature}°C</p>
+                    <p>• تركيز Zn²⁺: ${concentrationZn.toFixed(1)}M</p>
+                    <p>• تركيز Cu²⁺: ${concentrationCu.toFixed(1)}M</p>
+                </div>
+            `;
+            
+            modal.style.display = 'block';
+            
+            // Draw energy diagram
+            setTimeout(() => {
+                drawEnergyDiagram();
+            }, 100);
+        }
+
+        function drawEnergyDiagram() {
+            const canvas = document.getElementById('energy-diagram-canvas');
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw energy levels
+            ctx.strokeStyle = '#FFF';
+            ctx.lineWidth = 3;
+            ctx.font = 'bold 14px Arial';
+            ctx.fillStyle = '#FFF';
+            
+            // Zinc level (higher energy)
+            const zincLevel = 80;
+            ctx.beginPath();
+            ctx.moveTo(50, zincLevel);
+            ctx.lineTo(150, zincLevel);
+            ctx.stroke();
+            ctx.fillText('Zn/Zn²⁺', 160, zincLevel + 5);
+            ctx.fillText('-0.76 V', 160, zincLevel + 20);
+            
+            // Copper level (lower energy)
+            const copperLevel = 180;
+            ctx.beginPath();
+            ctx.moveTo(200, copperLevel);
+            ctx.lineTo(300, copperLevel);
+            ctx.stroke();
+            ctx.fillText('Cu²⁺/Cu', 310, copperLevel + 5);
+            ctx.fillText('+0.34 V', 310, copperLevel + 20);
+            
+            // Draw electron flow arrow
+            ctx.strokeStyle = '#00FFFF';
+            ctx.fillStyle = '#00FFFF';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(150, zincLevel);
+            ctx.lineTo(200, copperLevel);
+            ctx.stroke();
+            
+            // Arrow head
+            ctx.beginPath();
+            ctx.moveTo(200, copperLevel);
+            ctx.lineTo(190, copperLevel - 10);
+            ctx.lineTo(190, copperLevel + 10);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Voltage difference
+            ctx.strokeStyle = '#FFD700';
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath();
+            ctx.moveTo(30, zincLevel);
+            ctx.lineTo(30, copperLevel);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            
+            ctx.fillStyle = '#FFD700';
+            ctx.fillText(`ΔE = ${currentVoltage.toFixed(2)}V`, 35, (zincLevel + copperLevel) / 2);
+            
+            // Add animated electrons
+            if (isSimulationRunning) {
+                const time = Date.now() * 0.005;
+                for (let i = 0; i < 3; i++) {
+                    const progress = (time + i * 0.3) % 1;
+                    const x = 150 + progress * 50;
+                    const y = zincLevel + progress * (copperLevel - zincLevel);
+                    
+                    ctx.fillStyle = '#00FFFF';
+                    ctx.beginPath();
+                    ctx.arc(x, y, 10, 0, 2 * Math.PI);
+                    ctx.fill();
+                }
+            }
+        }
+
+        function updateVoltageFromConditions() {
+            // Nernst equation: E = E° - (RT/nF) * ln(Q)
+            // Simplified calculation for demonstration
+            const standardVoltage = 1.1; // Standard cell potential
+            let voltage = standardVoltage;
+            
+            if (concentrationEffect) {
+                // Q = [Zn²⁺]/[Cu²⁺]
+                const Q = concentrationZn / concentrationCu;
+                voltage = standardVoltage - 0.0128 * Math.log(Q); // Simplified Nernst equation
+            }
+            
+            if (temperatureEffect) {
+                // Temperature effect (simplified)
+                voltage = voltage * (1 + (temperature - 25) * 0.001);
+            }
+            
+            currentVoltage = Math.max(0.5, Math.min(1.5, voltage)); // Keep within reasonable bounds
+        }
+
+        function initializeElectronFlowParticles() {
+            electronFlowParticles = [];
+            for (let i = 0; i < 20; i++) {
+                electronFlowParticles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    vx: (Math.random() - 0.5) * 2,
+                    vy: (Math.random() - 0.5) * 2,
+                    life: Math.random() * 100,
+                    maxLife: 100 + Math.random() * 50
+                });
+            }
+        }
+
+        function drawEnhancedFeatures() {
+            // Draw voltage display
+            if (showVoltageDisplay && isSimulationRunning) {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+                ctx.fillRect(canvas.width - 200, 20, 180, 100);
+                ctx.strokeStyle = '#FFD700';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(canvas.width - 200, 20, 180, 100);
+                
+                ctx.fillStyle = '#FFD700';
+                ctx.font = 'bold 16px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('الجهد الكهربائي', canvas.width - 110, 45);
+                
+                ctx.font = 'bold 24px Arial';
+                ctx.fillStyle = '#00FF00';
+                ctx.fillText(`${currentVoltage.toFixed(2)} V`, canvas.width - 110, 75);
+                
+                ctx.font = 'bold 12px Arial';
+                ctx.fillStyle = '#FFF';
+                ctx.fillText(`درجة الحرارة: ${temperature}°C`, canvas.width - 110, 95);
+                ctx.fillText(`معدل التفاعل: ${reactionRate.toFixed(1)}x`, canvas.width - 110, 110);
+            }
+            
+            // Draw electron flow particles
+            if (showElectronFlow && isSimulationRunning) {
+                electronFlowParticles.forEach((particle, index) => {
+                    particle.x += particle.vx * reactionRate;
+                    particle.y += particle.vy * reactionRate;
+                    particle.life += reactionRate;
+                    
+                    // Wrap around screen
+                    if (particle.x < 0) particle.x = canvas.width;
+                    if (particle.x > canvas.width) particle.x = 0;
+                    if (particle.y < 0) particle.y = canvas.height;
+                    if (particle.y > canvas.height) particle.y = 0;
+                    
+                    // Reset particle if life exceeded
+                    if (particle.life > particle.maxLife) {
+                        particle.life = 0;
+                        particle.x = Math.random() * canvas.width;
+                        particle.y = Math.random() * canvas.height;
+                    }
+                    
+                    // Draw particle with trail
+                    const alpha = 1 - (particle.life / particle.maxLife);
+                    ctx.fillStyle = `rgba(0, 255, 255, ${alpha})`;
+                    ctx.beginPath();
+                    ctx.arc(particle.x, particle.y, 3, 0, 2 * Math.PI);
+                    ctx.fill();
+                    
+                    // Draw trail
+                    ctx.strokeStyle = `rgba(0, 255, 255, ${alpha * 0.5})`;
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.moveTo(particle.x, particle.y);
+                    ctx.lineTo(particle.x - particle.vx * 5, particle.y - particle.vy * 5);
+                    ctx.stroke();
+                });
+            }
+        }
+
+        // Prevent context menu on touch devices
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
+
+        // Prevent scrolling on touch devices when interacting with canvas
+        document.body.addEventListener('touchstart', function(e) {
+            if (e.target === canvas) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+
+        document.body.addEventListener('touchend', function(e) {
+            if (e.target === canvas) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+
+        document.body.addEventListener('touchmove', function(e) {
+            if (e.target === canvas) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+    </script>
+</body>
+</html>
+

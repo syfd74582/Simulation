@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>محاكاة دوران الكواكب حول الشمس</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #000;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            color: white;
+            position: relative;
+        }
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('./275px-Hubble_ultra_deep_field_high_rez_edit1.jpg') repeat;
+            animation: moveStars 100s linear infinite;
+            z-index: -1;
+        }
+        @keyframes moveStars {
+            from { background-position: 0 0; }
+            to { background-position: 1000px 1000px; }
+        }
+        .sun {
+            width: 10vw; /* حجم الشمس يتناسب مع عرض الشاشة */
+            height: 10vw;
+            background: url('./Sun.jpg') no-repeat center center/cover;
+            border-radius: 50%;
+            position: absolute;
+            box-shadow: 0 0 100px yellow;
+            animation: glow 2s infinite alternate;
+            z-index: 1;
+        }
+        @keyframes glow {
+            from { box-shadow: 0 0 50px yellow; }
+            to { box-shadow: 0 0 150px yellow; }
+        }
+        .orbit {
+            position: absolute;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform-origin: center;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+        .planet {
+            position: absolute;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 2vw; /* حجم الخط يتناسب مع عرض الشاشة */
+            text-align: center;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.5s ease, width 0.5s ease, height 0.5s ease;
+            z-index: 1;
+        }
+        .planet img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            animation: rotatePlanet 10s linear infinite;
+        }
+        @keyframes rotatePlanet {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .planet span {
+            margin-top: 10px;
+        }
+        .info-box {
+            position: absolute;
+            top: 100%; /* أسفل الكوكب */
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 1.5vw; /* حجم الخط يتناسب مع عرض الشاشة */
+            text-align: center;
+            display: none;
+            z-index: 2; /* فوق النجوم ولكن تحت الكوكب */
+        }
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+        .controls button {
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="stars"></div>
+    <div class="sun" title="الشمس"></div>
+
+    <!-- الكواكب والمدارات -->
+    <div class="orbit" id="orbit1"></div>
+    <div class="planet" id="planet1" title="عطارد">
+        <img src="./images/Aotard.jpg" alt="عطارد">
+        <span>عطارد</span>
+        <div class="info-box" id="info1">
+            <strong>عطارد</strong><br>
+            البعد عن الشمس: 57.9 مليون كم<br>
+            السرعة: 0.02 rad/إطار
+        </div>
+    </div>
+
+    <div class="orbit" id="orbit2"></div>
+    <div class="planet" id="planet2" title="الزهرة">
+        <img src="./images/Alzahra.jpg" alt="الزهرة">
+        <span>الزهرة</span>
+        <div class="info-box" id="info2">
+            <strong>الزهرة</strong><br>
+            البعد عن الشمس: 108.2 مليون كم<br>
+            السرعة: 0.015 rad/إطار
+        </div>
+    </div>
+
+    <div class="orbit" id="orbit3"></div>
+    <div class="planet" id="planet3" title="الأرض">
+        <img src="./images/Earth.jpg" alt="الأرض">
+        <span>الأرض</span>
+        <div class="info-box" id="info3">
+            <strong>الأرض</strong><br>
+            البعد عن الشمس: 149.6 مليون كم<br>
+            السرعة: 0.01 rad/إطار
+        </div>
+    </div>
+
+    <div class="orbit" id="orbit4"></div>
+    <div class="planet" id="planet4" title="المريخ">
+        <img src="./images/Almerekh.jpg" alt="المريخ">
+        <span>المريخ</span>
+        <div class="info-box" id="info4">
+            <strong>المريخ</strong><br>
+            البعد عن الشمس: 227.9 مليون كم<br>
+            السرعة: 0.008 rad/إطار
+        </div>
+    </div>
+
+    <div class="orbit" id="orbit5"></div>
+    <div class="planet" id="planet5" title="المشتري">
+        <img src="./images/Almoshtary.jpg" alt="المشتري">
+        <span>المشتري</span>
+        <div class="info-box" id="info5">
+            <strong>المشتري</strong><br>
+            البعد عن الشمس: 778.5 مليون كم<br>
+            السرعة: 0.005 rad/إطار
+        </div>
+    </div>
+
+    <div class="orbit" id="orbit6"></div>
+    <div class="planet" id="planet6" title="زحل">
+        <img src="./images/Zohal.jpg" alt="زحل">
+        <span>زحل</span>
+        <div class="info-box" id="info6">
+            <strong>زحل</strong><br>
+            البعد عن الشمس: 1.43 مليار كم<br>
+            السرعة: 0.003 rad/إطار
+        </div>
+    </div>
+
+    <div class="orbit" id="orbit7"></div>
+    <div class="planet" id="planet7" title="أورانوس">
+        <img src="./images/Oranos.jpg" alt="أورانوس">
+        <span>أورانوس</span>
+        <div class="info-box" id="info7">
+            <strong>أورانوس</strong><br>
+            البعد عن الشمس: 2.87 مليار كم<br>
+            السرعة: 0.002 rad/إطار
+        </div>
+    </div>
+
+    <div class="orbit" id="orbit8"></div>
+    <div class="planet" id="planet8" title="نبتون">
+        <img src="./images/Nbton.jpg" alt="نبتون">
+        <span>نبتون</span>
+        <div class="info-box" id="info8">
+            <strong>نبتون</strong><br>
+            البعد عن الشمس: 4.5 مليار كم<br>
+            السرعة: 0.0015 rad/إطار
+        </div>
+    </div>
+
+    <div class="orbit" id="orbit9"></div>
+    <div class="planet" id="planet9" title="بلوتو">
+        <img src="./images/Bloto.jpg" alt="بلوتو">
+        <span>بلوتو</span>
+        <div class="info-box" id="info9">
+            <strong>بلوتو</strong><br>
+            البعد عن الشمس: 5.91 مليار كم<br>
+            السرعة: 0.001 rad/إطار
+        </div>
+    </div>
+
+    <div class="controls">
+        <button onclick="toggleAnimation()">إيقاف/تشغيل الحركة</button>
+    </div>
+
+    <script>
+        // بيانات الكواكب (اسم، نصف قطر المدار، السرعة، الحجم)
+        const planets = [
+            { name: "عطارد", radius: 120, speed: 0.02, size: 40, distance: "57.9 مليون كم" },
+            { name: "الزهرة", radius: 180, speed: 0.015, size: 50, distance: "108.2 مليون كم" },
+            { name: "الأرض", radius: 240, speed: 0.01, size: 50, distance: "149.6 مليون كم" },
+            { name: "المريخ", radius: 300, speed: 0.008, size: 45, distance: "227.9 مليون كم" },
+            { name: "المشتري", radius: 400, speed: 0.005, size: 80, distance: "778.5 مليون كم" },
+            { name: "زحل", radius: 500, speed: 0.003, size: 70, distance: "1.43 مليار كم" },
+            { name: "أورانوس", radius: 600, speed: 0.002, size: 60, distance: "2.87 مليار كم" },
+            { name: "نبتون", radius: 700, speed: 0.0015, size: 60, distance: "4.5 مليار كم" },
+            { name: "بلوتو", radius: 800, speed: 0.001, size: 35, distance: "5.91 مليار كم" }
+        ];
+
+        // إنشاء العناصر والمدارات
+        planets.forEach((planet, index) => {
+            const orbit = document.getElementById(`orbit${index + 1}`);
+            const planetElement = document.getElementById(`planet${index + 1}`);
+            const infoBox = document.getElementById(`info${index + 1}`);
+
+            // تعيين أبعاد المدار
+            orbit.style.width = `${planet.radius * 2}px`;
+            orbit.style.height = `${planet.radius * 2}px`;
+
+            // تعيين حجم الكوكب
+            planetElement.style.width = `${planet.size}px`;
+            planetElement.style.height = `${planet.size}px`;
+
+            // إضافة حدث النقر لعرض المعلومات
+            planetElement.addEventListener('click', () => {
+                togglePlanetFocus(planetElement, planet, infoBox);
+            });
+        });
+
+        // زوايا الدوران
+        let angles = planets.map(() => 0);
+        let isAnimating = true;
+        let focusedPlanet = null;
+
+        function togglePlanetFocus(planetElement, planet, infoBox) {
+            if (focusedPlanet === planetElement) {
+                // إعادة الكوكب إلى مداره
+                planetElement.style.transform = `translate(${planet.radius}px, 0)`;
+                planetElement.style.width = `${planet.size}px`;
+                planetElement.style.height = `${planet.size}px`;
+                infoBox.style.display = 'none'; // إخفاء المعلومات
+                focusedPlanet = null;
+            } else {
+                // إيقاف الكواكب الأخرى إذا كان هناك كوكب مركز عليه
+                if (focusedPlanet) {
+                    const focusedIndex = Array.from(document.querySelectorAll('.planet')).indexOf(focusedPlanet);
+                    const focusedInfo = document.getElementById(`info${focusedIndex + 1}`);
+                    focusedPlanet.style.transform = `translate(${planets[focusedIndex].radius}px, 0)`;
+                    focusedPlanet.style.width = `${planets[focusedIndex].size}px`;
+                    focusedPlanet.style.height = `${planets[focusedIndex].size}px`;
+                    focusedInfo.style.display = 'none';
+                }
+
+                // جلب الكوكب إلى المركز وتكبيره
+                planetElement.style.transform = 'translate(0, 0) scale(3)'; // تكبير الكوكب
+                planetElement.style.width = `${planet.size * 3}px`;
+                planetElement.style.height = `${planet.size * 3}px`;
+                infoBox.style.display = 'block'; // عرض المعلومات
+                focusedPlanet = planetElement;
+            }
+        }
+
+        function animate() {
+            if (!isAnimating) return;
+
+            planets.forEach((planet, index) => {
+                if (focusedPlanet !== document.getElementById(`planet${index + 1}`)) {
+                    angles[index] += planet.speed; // تحديث الزاوية
+
+                    // حساب موقع الكوكب
+                    const x = planet.radius * Math.cos(angles[index]);
+                    const y = planet.radius * Math.sin(angles[index]);
+
+                    // تطبيق الموقع
+                    const planetElement = document.getElementById(`planet${index + 1}`);
+                    planetElement.style.transform = `translate(${x}px, ${y}px)`;
+                }
+            });
+
+            requestAnimationFrame(animate);
+        }
+
+        function toggleAnimation() {
+            isAnimating = !isAnimating;
+            if (isAnimating) animate();
+        }
+
+        animate();
+    </script>
+</body>
+</html>

@@ -1,0 +1,176 @@
+{
+    "Ceres":{
+        "diameter":946,
+        "mass":9.393,
+        "mass2":20,
+        "image":"./assets/ceres.png",
+        "description": "TEST Ceres",
+        "symbol":"./assets/ceres.svg"
+    },
+    "Charon":{
+        "diameter":1208,
+        "mass":1.52,
+        "mass2":21,
+        "image":"./assets/charon.png",
+        "description": "TEST Charon"
+    },
+    "Eris":{
+        "diameter":2326,
+        "mass":1.6466,
+        "mass2":22,
+        "image":"./assets/eris.png",
+        "description": "TEST Eris"
+    },
+    "Pluto":{
+        "diameter":2370,
+        "mass":1.3,
+        "mass2":22,
+        "image":"./assets/pluto.png",
+        "description": "TEST Pluto",
+        "symbol":"./assets/pluto.svg"
+    },
+    "Moon":{
+        "diameter":3474,
+        "mass":7.3476,
+        "mass2":22,
+        "image":"./assets/moon.png",
+        "description": "TEST Moon",
+        "symbol":"./assets/moon.svg"
+    },
+    "Mercury":{
+        "diameter":4879,
+        "mass":3.301,
+        "mass2":23,
+        "image":"./assets/mercury.png",
+        "description": "TEST Mercury",
+        "symbol":"./assets/mercury.svg"
+    },
+    "Mars":{
+        "diameter":6794,
+        "mass":6.4171,
+        "mass2":23,
+        "image":"./assets/mars.png",
+        "description": "TEST Mars",
+        "symbol":"./assets/mars.svg"
+    },
+    "Sirius-B":{
+        "diameter":11693,
+        "mass":1.95,
+        "mass2":30,
+        "image":"./assets/sirius_b.png",
+        "description": "TEST Sirius-B"
+    },
+    
+    "Venus":{
+        "diameter":12104,
+        "mass":4.8673,
+        "mass2":24,
+        "image":"./assets/venus.png",
+        "description": "TEST Venus",
+        "symbol":"./assets/venus.svg"
+    },
+    "Earth":{
+        "diameter":12756,
+        "mass":5.972,
+        "mass2":24,
+        "image":"./assets/earth.png",
+        "description": "Blue planet of water",
+        "symbol":"./assets/earth.svg"
+    },
+    "Kepler-452b":{
+        "diameter":20793,
+        "mass":1.96,
+        "mass2":25,
+        "image":"./assets/kepler452b.png",
+        "description": "TEST Kepler-452b"
+    },
+    "55-Cancri-e":{
+        "diameter":26022,
+        "mass":4.65816,
+        "mass2":25,
+        "image":"./assets/55cancri_e.png",
+        "description": "TEST 55-Cancri-e"
+    },
+    "Kepler-22b":{
+        "diameter":29388,
+        "mass":2.096172,
+        "mass2":26,
+        "image":"./assets/kepler22b.png",
+        "description": "TEST Kepler-22b"
+    },
+    "Neptune":{
+        "diameter":49528,
+        "mass":1.02413,
+        "mass2":26,
+        "image":"./assets/neptune.png",
+        "description": "TEST Neptune",
+        "symbol":"./assets/neptune.svg"
+    },
+    "Uranus":{
+        "diameter":51118,
+        "mass":8.6811,
+        "mass2":25,
+        "image":"./assets/uranus.png",
+        "description": "TEST Uranus",
+        "symbol":"./assets/uranus.svg"
+    },
+    "Hat-p-11b":{
+        "diameter":60339,
+        "mass":1.538,
+        "mass2":26,
+        "image":"./assets/hat_p_11b.png",
+        "description": "TEST Hat-p-11b"
+    },
+    "Saturn":{
+        "diameter":120536,
+        "mass":5.688,
+        "mass2":26,
+        "image":"./assets/saturn.png",
+        "description": "TEST Saturn",
+        "symbol":"./assets/saturn.svg"
+    },
+    "Jupiter":{
+        "diameter":142984,
+        "mass":1.8986,
+        "mass2":27,
+        "image":"./assets/jupiter.png",
+        "description": "TEST Jupiter",
+        "symbol":"./assets/jupiter.svg"
+    },
+    "OGLE-TR-122b":{
+        "diameter":167040,
+        "mass":1.79,
+        "mass2":29,
+        "image":"./assets/ogle_tr_122b.png",
+        "description": "TEST OGLE-TR-122b"
+    },
+    "Wasp-17b":{
+        "diameter":284681,
+        "mass":9.23,
+        "mass2":26,
+        "image":"./assets/wasp17b.png",
+        "description": "TEST Wasp-17b"
+    },
+    "Lalande 21185":{
+        "diameter":574060,
+        "mass":9.15,
+        "mass2":29,
+        "image":"./assets/lalande21185.png",
+        "description": "TEST Lalande 21185"
+    },
+    "WR-102":{
+        "diameter":723840,
+        "mass":3.2,
+        "mass2":31,
+        "image":"./assets/wr102.png",
+        "description": "TEST WR-102"
+    },
+    "Sun":{
+        "diameter":1392000,
+        "mass":1.9891,
+        "mass2":30,
+        "image":"./assets/sun.png",
+        "description": "TEST Sun",
+        "symbol":"./assets/sun.svg"
+    }
+}
